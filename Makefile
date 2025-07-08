@@ -47,7 +47,6 @@ setup:
        @docker compose build mev-bot-v2-dev
        @docker compose run --rm smart-contracts-dev bash -c "forge install"
        @docker compose run --rm mev-bot-v2-dev sh -c "go mod tidy && go mod download"
-
 test-bot:
 	@docker compose run mev-bot-v2-dev sh -c "go test ./..."
 
