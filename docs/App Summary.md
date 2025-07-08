@@ -43,7 +43,7 @@ This file orchestrates the local development environment using Docker, defining 
 Common tasks are wrapped in a Makefile for convenience:
 
 ```bash
-make setup      # Build Docker images and install Go/Foundry dependencies
+make setup      # Build images, install deps, and create a .env file if needed
 make run-dev    # Build the bot and start it together with Anvil
 make down       # Stop all running containers
 ```
