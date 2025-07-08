@@ -39,6 +39,7 @@ run-bot-client:
 down:
 	@docker compose down
 setup:
+	@command -v docker >/dev/null || (echo "Error: docker is not installed or not in PATH."; echo "Install Docker and Docker Compose to use this task."; exit 1)
 	@echo "Preparing development containers and dependencies"
 	# Pull prebuilt images first; skip mev-bot-v2-dev which we build locally
 	@docker compose pull anvil smart-contracts-dev
