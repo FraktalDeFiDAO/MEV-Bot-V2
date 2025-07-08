@@ -65,6 +65,7 @@ graph TD
 
 Ensure Docker is installed and running, then run the following commands from the project root:
 
+
 ```bash
 make setup      # Build containers and install all dependencies
 make run-dev    # Build the bot and start it along with Anvil
