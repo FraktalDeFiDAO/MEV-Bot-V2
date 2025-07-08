@@ -5,7 +5,7 @@ This repository contains the full codebase for a high-frequency arbitrage bot de
 ## **System Architecture**
 
 The system is composed of two primary parts: an **On-Chain Component** (Solidity smart contracts) and an **Off-Chain Component** (Go services).
-
+```mermaid
 graph TD  
     subgraph Off-Chain Infrastructure (Go)  
         A\[Ethereum RPC Node\] \--\> B{Subscriber};  
@@ -32,6 +32,7 @@ graph TD
 
     style J fill:\#f9f,stroke:\#333,stroke-width:2px  
     style I fill:\#bbf,stroke:\#333,stroke-width:2px
+```
 
 ### **Key Components**
 
@@ -55,9 +56,25 @@ graph TD
 
 ### **Prerequisites**
 
-* [Go](https://go.dev/doc/install) (version 1.18+)  
-* [Foundry](https://getfoundry.sh/) for smart contract development and testing.  
+* [Go](https://go.dev/doc/install) (version 1.18+)
+* [Foundry](https://getfoundry.sh/) for smart contract development and testing.
+* Docker and Docker Compose (verify with `docker --version` and `docker compose version`)
 * An Ethereum RPC endpoint URL (e.g., from Infura or Alchemy).
+
+### **Quickstart (Docker & Makefile)**
+
+Ensure Docker and Docker Compose are installed and running, then run the following commands from the project root:
+
+```bash
+make setup      # Build containers, install dependencies, and create a .env file
+make run-dev    # Build the bot and start it along with Anvil
+```
+
+Stop the containers with:
+
+```bash
+make down
+```
 
 ### **1\. Smart Contracts**
 

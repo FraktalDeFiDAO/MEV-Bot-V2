@@ -15,8 +15,8 @@ run-dev:
 		${MAKE} run-bot 
 
 run-bot:
-	@echo "Running bot"
-	@docker compose up mev-bot-v2-dev
+       @echo "Running bot with local anvil"
+       @docker compose up anvil mev-bot-v2-dev
 
 
 gen-codebase:
@@ -38,4 +38,18 @@ run-bot-client:
 
 down:
 	@docker compose down
-	
+setup:
+       @command -v docker >/dev/null || (echo "Error: docker is not installed or not in PATH."; exit 1)
+       @docker compose version >/dev/null 2>&1 || command -v docker-compose >/dev/null || (echo "Error: Docker Compose is not installed."; exit 1)
+       @if [ ! -f .env ]; then echo "Creating .env from sample" && cp .env.sample .env; fi
+       @echo "Building development containers and installing dependencies"
+       @docker compose pull --quiet anvil smart-contracts-dev
+       @docker compose build mev-bot-v2-dev
+       @docker compose run --rm smart-contracts-dev bash -c "forge install"
+       @docker compose run --rm mev-bot-v2-dev sh -c "go mod tidy && go mod download"
+
+test-bot:
+	@docker compose run mev-bot-v2-dev sh -c "go test ./..."
+
+test-contracts:
+	@docker compose run smart-contracts-dev bash -c "forge test --fork-url $${MAINNET_RPC_URL} -vv"
