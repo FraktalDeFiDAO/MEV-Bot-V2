@@ -1,0 +1,21 @@
+[profile.default]
+solc = "0.8.29"
+src = 'src'
+out = 'out'
+libs = ['lib']
+no_match_path = "*/integration/*"
+ffi = true
+fs_permissions = [
+    { access = "read-write", path = "./out"},
+    { access = "read-write", path = "./lib/calibur/out/"}
+]
+optimizer = true
+optimizer_runs = 1000000
+
+[profile.integration]
+match_path = "*/integration/*"
+no_match_path = "override/default/*"
+
+[profile.lite.optimizer_details.yulDetails]
+stackAllocation = true
+optimizerSteps = 'xca'
