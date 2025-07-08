@@ -39,8 +39,9 @@ graph TD
 #### **On-Chain (Solidity)**
 
 * **Diamond.sol**: The central proxy contract that follows the EIP-2535 Diamond Standard. It provides upgradeability and modularity by delegating calls to various facets.  
-* **ArbitrageFacet.sol**: The core execution logic. It receives instructions from the off-chain bot, requests a flash loan from Aave, executes a sequence of two trades, and repays the loan within a single atomic transaction.  
+* **ArbitrageFacet.sol**: The core execution logic. It receives instructions from the off-chain bot, requests a flash loan from Aave, executes a sequence of two trades, and repays the loan within a single atomic transaction.
 * **AccessControlFacet.sol**: Manages ownership and role-based access for administrative functions on the Diamond.
+* **LibArbitrageCalculator.sol**: Library used by the facets to analyze pools, find arbitrage paths, and estimate loan sizes.
 
 #### **Off-Chain (Go)**
 

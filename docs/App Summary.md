@@ -185,8 +185,9 @@ These contracts provide registry and utility services to the main arbitrage syst
 * **Intent**: To manage information about different DEXs. It complements the `ContractRegistry` by linking a DEX's name and platform type (e.g., UniswapV2) to its router/factory contract ID in the registry.
 * **`IExchangeHelper.sol`**: Defines enums for `ExchangePlatform` and `ExchangeCategory`, the `Exchange` struct, and the `EXCHANGE_HELPER_ADMIN_ROLE`. 
 * **`LibExchangeHelperStorage.sol`**: Manages the storage for exchange information. 
-* **`LibExchangeUtils.sol`**: A utility library with functions to detect a pool's type (`detectExchangeType`) by checking for the existence of specific functions (duck-typing) and to derive a pool address from its factory and tokens (`getPoolOrPairAddress`). 
-* **`ExchangeHelperFacet.sol`**: The external, access-controlled interface for managing exchange data. 
+* **`LibExchangeUtils.sol`**: A utility library with functions to detect a pool's type (`detectExchangeType`) by checking for the existence of specific functions (duck-typing) and to derive a pool address from its factory and tokens (`getPoolOrPairAddress`).
+* **`LibArbitrageCalculator.sol`**: New library for analyzing two pools, determining the common pivot token, and estimating flash loan amounts and swap outputs.
+* **`ExchangeHelperFacet.sol`**: The external, access-controlled interface for managing exchange data.
 
 ---
 
