@@ -14,7 +14,9 @@ func TestDBWriterCommitBatch(t *testing.T) {
 		Type:  SaveTokenRequest,
 		Token: &TokenRecord{Address: "0x1", Symbol: "TST", Decimals: 18},
 	})
-	writer.commitBatch()
+	if err := writer.commitBatch(); err != nil {
+		t.Fatalf("commit failed: %v", err)
+	}
 
 	row := writer.db.QueryRow("SELECT symbol FROM tokens WHERE address = ?", "0x1")
 	var symbol string

@@ -89,22 +89,26 @@ func (w *DBWriter) Run() {
 		case req := <-w.WriteQueue:
 			w.batch = append(w.batch, req)
 			if len(w.batch) >= 100 { // Commit if batch size is reached
-				w.commitBatch()
+				if err := w.commitBatch(); err != nil {
+					log.Printf("DB Writer: batch commit failed: %v", err)
+				}
 			}
 		case <-w.batchTicker.C:
 			if len(w.batch) > 0 { // Commit on a timer
-				w.commitBatch()
+				if err := w.commitBatch(); err != nil {
+					log.Printf("DB Writer: batch commit failed: %v", err)
+				}
 			}
 		}
 	}
 }
 
 // commitBatch processes the current batch of write requests in a single DB transaction.
-func (w *DBWriter) commitBatch() {
+func (w *DBWriter) commitBatch() error {
 	tx, err := w.db.Begin()
 	if err != nil {
 		log.Printf("DB Writer: Error starting transaction: %v", err)
-		return
+		return err
 	}
 
 	for _, req := range w.batch {
@@ -127,7 +131,7 @@ func (w *DBWriter) commitBatch() {
 				log.Printf("DB Writer: Error during rollback: %v", rbErr)
 			}
 			w.batch = w.batch[:0]
-			return
+			return wErr
 		}
 	}
 
@@ -136,8 +140,10 @@ func (w *DBWriter) commitBatch() {
 		if rbErr := tx.Rollback(); rbErr != nil {
 			log.Printf("DB Writer: Error during rollback: %v", rbErr)
 		}
+		return err
 	}
 	w.batch = w.batch[:0] // Clear the batch
+	return nil
 }
 
 // migrate creates the database schema if it doesn't exist.
