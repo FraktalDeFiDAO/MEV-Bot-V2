@@ -36,7 +36,17 @@ This file orchestrates the local development environment using Docker, defining 
 
 * **`smart-contracts-dev` service**:
     * **Intent**: To provide an environment for compiling, deploying, and interacting with the Solidity smart contracts.
-    * **Mechanics**: It uses a Foundry image and mounts the `smart-contracts/` directory. Like the bot, its `RPC_URL` is set to point to the `anvil` service, so `forge` scripts (like deployment and upgrades) can be run from within this container against the local forked chain.
+  * **Mechanics**: It uses a Foundry image and mounts the `smart-contracts/` directory. Like the bot, its `RPC_URL` is set to point to the `anvil` service, so `forge` scripts (like deployment and upgrades) can be run from within this container against the local forked chain.
+
+### Using the Makefile
+
+Common tasks are wrapped in a Makefile for convenience:
+
+```bash
+make setup      # Build images, install deps, and create a .env file if needed
+make run-dev    # Build the bot and start it together with Anvil
+make down       # Stop all running containers
+```
 
 ---
 
