@@ -59,6 +59,8 @@ graph TD
 * [Go](https://go.dev/doc/install) (version 1.18+)
 * [Foundry](https://getfoundry.sh/) for smart contract development and testing.
 * Docker and Docker Compose (verify with `docker --version` and `docker compose version`)
+* An Ethereum RPC endpoint URL (e.g., from Infura or Alchemy).
+
 ### **Quickstart (Docker & Makefile)**
 
 Ensure Docker and Docker Compose are installed and running, then run the following commands from the project root:
