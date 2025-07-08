@@ -56,9 +56,25 @@ graph TD
 
 ### **Prerequisites**
 
-* [Go](https://go.dev/doc/install) (version 1.18+)  
-* [Foundry](https://getfoundry.sh/) for smart contract development and testing.  
+* [Go](https://go.dev/doc/install) (version 1.18+)
+* [Foundry](https://getfoundry.sh/) for smart contract development and testing.
+* Docker and Docker Compose
 * An Ethereum RPC endpoint URL (e.g., from Infura or Alchemy).
+
+### **Quickstart (Docker & Makefile)**
+
+Run the following commands from the project root:
+
+```bash
+make setup      # Build containers and install all dependencies
+make run-dev    # Build the bot and start it along with Anvil
+```
+
+Stop the containers with:
+
+```bash
+make down
+```
 
 ### **1\. Smart Contracts**
 

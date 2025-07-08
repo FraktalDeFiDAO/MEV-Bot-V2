@@ -56,23 +56,33 @@ func NewService(client *ethclient.Client, pk *ecdsa.PrivateKey, diamondAddress, 
 func (s *Service) Execute(opportunity *model.ArbitrageData) {
 	log.Printf("Attempting to execute arbitrage for opportunity: %+v", opportunity)
 
-	tx, err := s.createDynamicTx(context.Background(), opportunity)
-	if err != nil {
-		log.Printf("ERROR: Failed to create dynamic transaction: %v", err)
-		return
-	}
-
 	maxRetries := 3
 	retryDelay := 500 * time.Millisecond
 
+	var err error
 	for i := 0; i < maxRetries; i++ {
+		tx, err := s.createDynamicTx(context.Background(), opportunity)
+		if err != nil {
+			log.Printf("ERROR: Failed to create dynamic transaction: %v", err)
+			return
+		}
+
 		err = s.ethClient.SendTransaction(context.Background(), tx)
 		if err == nil {
 			log.Printf("Successfully sent transaction with hash: %s", tx.Hash().Hex())
 			return
 		}
 
-		if strings.Contains(err.Error(), "nonce too low") || strings.Contains(err.Error(), "insufficient funds") {
+		if strings.Contains(err.Error(), "nonce too low") {
+			log.Printf("WARN: Nonce too low, refreshing nonce and retrying: %v", err)
+			if nErr := s.refreshNonce(context.Background()); nErr != nil {
+				log.Printf("ERROR: Failed to refresh nonce: %v", nErr)
+				return
+			}
+			continue
+		}
+
+		if strings.Contains(err.Error(), "insufficient funds") {
 			log.Printf("ERROR: Unrecoverable error sending transaction: %v. Not retrying.", err)
 			return
 		}
@@ -83,6 +93,24 @@ func (s *Service) Execute(opportunity *model.ArbitrageData) {
 	}
 
 	log.Printf("ERROR: Failed to send transaction after %d attempts. Last error: %v", maxRetries, err)
+}
+
+func (s *Service) refreshNonce(ctx context.Context) error {
+	addr, err := s.getSenderAddress()
+	if err != nil {
+		return err
+	}
+
+	n, err := s.ethClient.PendingNonceAt(ctx, addr)
+	if err != nil {
+		return err
+	}
+
+	s.nonceMu.Lock()
+	defer s.nonceMu.Unlock()
+	s.nextNonce = n
+	s.nonceInited = true
+	return nil
 }
 
 // createDynamicTx prepares a new EIP-1559 transaction.

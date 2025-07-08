@@ -36,6 +36,17 @@ run-bot-client:
 	@docker compose exec mev-bot-v2-dev  \
 		bin/mev-bot-v2-alpha --mode executor
 
-down:
-	@docker compose down
-	
+down:        @docker compose down
+
+setup:
+	@echo "Preparing development containers and dependencies"
+	@docker compose pull
+	@docker compose build
+	@docker compose run smart-contracts-dev bash -c "forge install"
+	@docker compose run mev-bot-v2-dev sh -c "go mod tidy && go mod vendor"
+
+test-bot:
+	@docker compose run mev-bot-v2-dev sh -c "go test ./..."
+
+test-contracts:
+	@docker compose run smart-contracts-dev bash -c "forge test --fork-url $${MAINNET_RPC_URL} -vv"
