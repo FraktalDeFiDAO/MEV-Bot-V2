@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mev-bot-v2-dev:
     image: go-dev
