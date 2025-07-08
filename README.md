@@ -113,4 +113,4 @@ go test ./...
 
 **Run the Bot:**
 
-go run main.go  
+go run cmd/main.go  
