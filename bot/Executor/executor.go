@@ -10,8 +10,8 @@ import (
 	"log"
 	"math/big"
 	"strings"
-	"time"
 	"sync"
+	"time"
 
 	// CORRECTED: Import path now points to the correct location of the generated binding.
 	"fraktal/mev-bot-v2/contracts/ArbitrageFacet"
@@ -29,12 +29,10 @@ type Service struct {
 	ethClient           *ethclient.Client
 	privateKey          *ecdsa.PrivateKey
 	arbitrageFacet      *ArbitrageFacet.ArbitrageFacet
-	    aaveProviderAddress common.Address
-	    nonceMu              sync.Mutex
-	    nextNonce           uint64
-	    nonceInited         bool
-	    nextNonce            uint64
-	    nonceInited          bool
+	aaveProviderAddress common.Address
+	nonceMu             sync.Mutex
+	nextNonce           uint64
+	nonceInited         bool
 }
 
 // NewService creates and returns a new instance of the Executor service.
@@ -94,23 +92,23 @@ func (s *Service) createDynamicTx(ctx context.Context, opportunity *model.Arbitr
 		return nil, err
 	}
 
-	    // Allocate nonce sequentially to avoid concurrent race conditions
-	    s.nonceMu.Lock()
-	    var nonce uint64
-	    if !s.nonceInited {
-	        n, err := s.ethClient.PendingNonceAt(ctx, fromAddress)
-	        if err != nil {
-	            s.nonceMu.Unlock()
-	            return nil, err
-	        }
-	        nonce = n
-	        s.nextNonce = n + 1
-	        s.nonceInited = true
-	    } else {
-	        nonce = s.nextNonce
-	        s.nextNonce++
-	    }
-	    s.nonceMu.Unlock()
+	// Allocate nonce sequentially to avoid concurrent race conditions
+	s.nonceMu.Lock()
+	var nonce uint64
+	if !s.nonceInited {
+		n, err := s.ethClient.PendingNonceAt(ctx, fromAddress)
+		if err != nil {
+			s.nonceMu.Unlock()
+			return nil, err
+		}
+		nonce = n
+		s.nextNonce = n + 1
+		s.nonceInited = true
+	} else {
+		nonce = s.nextNonce
+		s.nextNonce++
+	}
+	s.nonceMu.Unlock()
 
 	gasTipCap, err := s.ethClient.SuggestGasTipCap(ctx)
 	if err != nil {

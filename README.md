@@ -5,7 +5,7 @@ This repository contains the full codebase for a high-frequency arbitrage bot de
 ## **System Architecture**
 
 The system is composed of two primary parts: an **On-Chain Component** (Solidity smart contracts) and an **Off-Chain Component** (Go services).
-
+```mermaid
 graph TD  
     subgraph Off-Chain Infrastructure (Go)  
         A\[Ethereum RPC Node\] \--\> B{Subscriber};  
@@ -32,6 +32,7 @@ graph TD
 
     style J fill:\#f9f,stroke:\#333,stroke-width:2px  
     style I fill:\#bbf,stroke:\#333,stroke-width:2px
+```
 
 ### **Key Components**
 
