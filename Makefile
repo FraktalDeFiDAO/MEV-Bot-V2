@@ -18,7 +18,6 @@ run-bot:
 	@echo "Running bot with local anvil"
 	@docker compose up anvil mev-bot-v2-dev
 
-
 gen-codebase:
 	@codebase-gen -dir ./smart-contracts/ \
 		-iname "*.sol" -out codebase_sol.txt  \
