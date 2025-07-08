@@ -1,0 +1,33 @@
+vendor/
+.env
+.env.*
+!.env.sample
+*/.env
+*/.env.*
+!*/.env.sample
+*/vendor/
+smart-contracts/lib/
+# Generated files
+codebase_go.txt
+codebase_sol.txt
+contract-lib.txt
+contracts-go.txt
+contracts-deps.txt
+new-codebase.txt
+tree.txt
+uniswap-lib.txt
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*~
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+*/tmo/*
+# Backups and temporary files
+bkup/
+tmo/
+bot/mev-data*.db
+bot/logs/

@@ -1,0 +1,132 @@
+--- a/Updater/updater.go
++++ b/Updater/updater.go
+@@ -4,11 +4,13 @@
+ 	"log"
+ 	"math/big"
+ 
++	"github.com/ethereum/go-ethereum/accounts/abi"
+ 	"github.com/ethereum/go-ethereum/common"
+ 	"github.com/ethereum/go-ethereum/ethclient"
+-	
+-	// These would be your generated bindings
+-	"your-project/bindings/multicall" 
++
++	// Change to multicall3 bindings to support tryAggregate
++	"your-project/bindings/multicall3"
++	"your-project/bindings/uniswapv2"
+ )
+ 
+ type Pool struct {
+@@ -20,61 +22,84 @@
+ 	Reserve1 *big.Int
+ }
+ 
+-// This is the core function to fix.
++// This is the core function to fix, now using a robust multicall pattern.
+ func refreshReserves(client *ethclient.Client, multicallAddress common.Address, pools []common.Address) {
+-	// 1. Get bindings for multicall and the contract you're calling (e.g., UniswapV2Pair)
+-	multicall, err := multicall.NewMulticall(multicallAddress, client)
++	// 1. Get bindings for multicall3 and the UniswapV2 pair contract
++	multicall, err := multicall3.NewMulticall3(multicallAddress, client)
+ 	if err != nil {
+-		log.Fatalf("Failed to instantiate Multicall contract: %v", err)
++		log.Fatalf("Failed to instantiate Multicall3 contract: %v", err)
+ 	}
+ 
+ 	pairABI, err := uniswapv2.Uniswapv2MetaData.GetAbi()
+ 	if err != nil {
+-		log.Fatalf("Failed to parse Pair ABI: %v", err)
++		log.Fatalf("Failed to get Pair ABI: %v", err)
+ 	}
+ 
+ 	// 2. Construct the batch of calls
+-	var calls []multicall.Call
++	var calls []multicall3.Multicall3Call
+ 	for _, poolAddress := range pools {
+ 		// Pack the calldata for the `getReserves` function
+-		callData, _ := pairABI.Pack("getReserves")
+-		calls = append(calls, multicall.Call{
++		callData, err := pairABI.Pack("getReserves")
++		if err != nil {
++			log.Printf("ERROR: Failed to pack calldata for pool %s: %v", poolAddress.Hex(), err)
++			continue
++		}
++
++		calls = append(calls, multicall3.Multicall3Call{
+ 			Target:   poolAddress,
+ 			CallData: callData,
+ 		})
+ 	}
+ 
+-	// 3. Execute the call. This is brittle and will revert the whole batch if one call fails.
+-	_, returnData, err := multicall.Aggregate(nil, calls)
++	// 3. Execute the call using Aggregate, which in Multicall3 bindings can perform a try-aggregate.
++	// The generated binding should handle passing the `requireSuccess` flag as `false`.
++	results, err := multicall.Aggregate(nil, calls)
+ 	if err != nil {
+-		// This error hides which specific call failed.
+-		log.Printf("Updater: Error during reserves batch call, will retry later: %v", err)
++		// This would be a network error or a problem with the multicall contract itself
++		log.Printf("Updater: Multicall aggregate RPC call failed: %v", err)
+ 		return
+ 	}
+ 
+-	// 4. Process the results. This loop is only reached if all calls succeed.
+-	for i, data := range returnData {
+-		poolAddress := calls[i].Target
++	// 4. Process the results, checking the `Success` flag for each individual call
++	for i, res := range results {
++		poolAddress := calls[i].Target // Get the address corresponding to this result
++
++		if !res.Success {
++			// This is the key improvement: we log the specific failure and move on.
++			log.Printf("Updater: A call failed for pool %s. Skipping update.", poolAddress.Hex())
++			continue
++		}
++
++		// The call was successful, now unpack the return data
+ 		var reserves struct {
+ 			Reserve0           *big.Int
+ 			Reserve1           *big.Int
+ 			BlockTimestampLast uint32
+ 		}
+-		
+-		err := pairABI.UnpackIntoInterface(&reserves, "getReserves", data)
++
++		// The error "failed to unpack call outputs... type is not a struct" happens here.
++		// This means the `res.ReturnData` does not match the fields in the `reserves` struct.
++		// Ensure your struct EXACTLY matches the return signature of `getReserves()`.
++		err := pairABI.UnpackIntoInterface(&reserves, "getReserves", res.ReturnData)
+ 		if err != nil {
+ 			log.Printf("Updater: Failed to unpack reserves for pool %s: %v", poolAddress.Hex(), err)
+ 			continue
+ 		}
+ 
++		// 5. Update your cache with the new, valid reserves
+ 		if p, ok := poolCache[poolAddress]; ok {
+ 			p.Reserve0 = reserves.Reserve0
+ 			p.Reserve1 = reserves.Reserve1
++			log.Printf("Updater: Successfully refreshed reserves for pool %s", poolAddress.Hex())
+ 		}
+ 	}
+ }
+ 
++@@ -88,10 +109,15 @@
+ func calculateArbitrage(poolA *Pool, poolB *Pool) {
+-    // No sanity checks, vulnerable to nil/zero reserves
++    // SANITY CHECK: Ensure reserves are not zero or nil before doing any math.
++    if poolA.Reserve0 == nil || poolA.Reserve1 == nil || poolA.Reserve0.Cmp(big.NewInt(0)) == 0 || poolA.Reserve1.Cmp(big.NewInt(0)) == 0 {
++        // log.Printf("Skipping calculation for Pool A (%s) due to invalid reserves.", poolA.Address.Hex())
++        return
++    }
++
++    if poolB.Reserve0 == nil || poolB.Reserve1 == nil || poolB.Reserve0.Cmp(big.NewInt(0)) == 0 || poolB.Reserve1.Cmp(big.NewInt(0)) == 0 {
++        // log.Printf("Skipping calculation for Pool B (%s) due to invalid reserves.", poolB.Address.Hex())
++        return
++    }
++    
+     // --- Your existing price calculation logic here ---
+-    // priceA := new(big.Float).Quo(new(big.Float).SetInt(poolA.Reserve1), new(big.Float).SetInt(poolA.Reserve0))
+-    // priceB := new(big.Float).Quo(new(big.Float).SetInt(poolB.Reserve1), new(big.Float).SetInt(poolB.Reserve0))
+-    // ... etc ...
+ }

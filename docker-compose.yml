@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mev-bot-v2-dev:
+    image: go-dev
+    container_name: mev-bot-v2-dev
+    build:
+      context: ./
+      target: go-dev
+    # The bot service will get its RPC_URL from this environment block,
+    # overriding any value from the .env file. This ensures it connects
+    # to the Anvil container, not the public Arbitrum RPC.
+    environment:
+      - RPC_URL=http://anvil:8545
+      # Pass through other necessary variables from the .env file
+      - GIN_MODE=${GIN_MODE}
+      - UNISWAP_VERSION_CHECKER_ADDRESS=${UNISWAP_VERSION_CHECKER_ADDRESS}
+    env_file:
+      - .env
+    volumes:
+      # Corrected: Mount the 'bot' directory which is your Go project root
+      - ./bot:/app
+      - /go
+    working_dir: /app
+    # depends_on:
+    #   - anvil # Ensures Anvil starts before the bot attempts to connect
+    # # Add a command if you need to run the bot automatically
+    command: bin/mev-bot-v2-alpha --mode dispatcher
+    restart: unless-stopped
+
+  smart-contracts-dev:
+    container_name: mev-bot-contracts-dev
+    image: ghcr.io/foundry-rs/foundry:stable
+    volumes:
+      - ./smart-contracts:/home/foundry/app
+    working_dir: /home/foundry/app
+    # Set the RPC_URL so you can run scripts inside the container against Anvil
+    environment:
+      - RPC_URL=http://anvil:8545 
+    env_file:
+      - .env
+    user: root
+    # depends_on:
+    #   - anvil
+
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:stable
+    container_name: anvil
+    # This command is the key to forking Arbitrum.
+    # It uses environment variables from the .env file.
+    command: >
+      anvil
+      --fork-url ${ARBITRUM_MAINNET_RPC_URL}
+      --fork-block-number ${FORK_BLOCK_NUMBER}
+      --host 0.0.0.0
+      --chain-id 31337 
+    ports:
+      - "8545:8545"

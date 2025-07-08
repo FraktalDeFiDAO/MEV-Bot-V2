@@ -1,0 +1,48 @@
+# Go
+vendor/
+build/
+
+# Environment
+.env
+.env.*
+!.env.sample
+*/.env
+*/.env.*
+!*/.env.sample
+
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Backups and temporary files
+bkup/
+tmo/
+'ChatGPT Image Jul 5, 2025, 08_47_09 PM.png'
+update.diff
+
+# Generated files
+codebase_go.txt
+codebase_sol.txt
+contract-lib.txt
+contracts-go.txt
+contracts-deps.txt
+new-codebase.txt
+tree.txt
+uniswap-lib.txt
+
+# OS-specific
+.DS_Store
+Thumbs.db
+*/vendor/
+smart-contracts/lib/
