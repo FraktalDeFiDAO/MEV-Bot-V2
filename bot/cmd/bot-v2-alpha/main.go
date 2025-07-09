@@ -87,7 +87,7 @@ func runDispatcher(addr string) {
 	// --- Initialize Application Services with Corrected Dependencies ---
 	scannerService := Scanner.NewService(cache, hub, dbWriter.WriteQueue)
 	marketService := Market.NewService(cache, scannerService, parserService, dbWriter.WriteQueue, debugLogger)
-	discoveryService, err := Discovery.NewService(cfg, ethClient, mcService, cache, marketService, discoveryQueue, dbWriter.WriteQueue)
+	discoveryService, err := Discovery.NewService(&cfg, ethClient, mcService, cache, marketService, discoveryQueue, dbWriter.WriteQueue)
 	if err != nil {
 		log.Fatalf("FATAL: Error creating Discovery service: %v", err)
 	}
