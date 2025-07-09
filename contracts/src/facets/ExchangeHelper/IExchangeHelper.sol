@@ -32,6 +32,19 @@ struct ExchangeHelperStorage {
     bool initialized;
 }
 
+struct PoolParams {
+    address tokenA;
+    address tokenB;
+}
+
+event ExchangeContractAdded(uint16 indexed id, address exchangeAddress);
+event ExchangeContractStatusChanged(uint16 indexed id, bool isActive);
+event ExchangeHelperStorageOwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+error EH_Unauthorized();
+error EH_ContractRegistryAddressNotSet();
+error EH_RolesAlreadyConfigured();
+
 event ExchangeAdded(uint16 indexed id, string name);
 event ExchangeStatusChanged(uint16 indexed id, bool isActive);
 
@@ -44,6 +57,8 @@ error EH_NotInitialized();
 error EH_AlreadyInitialized();
 error EH_InvalidAddress();
 error EH_MaxExchangesReached();
+
+bytes32 constant EXCHANGE_HELPER_ADMIN_ROLE = keccak256("EXCHANGE_HELPER_ADMIN_ROLE");
 
 interface IExchangeHelper {
     function detectExchangeType(address pool) external view returns (ExchangeCategory category, bool success);
