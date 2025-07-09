@@ -4,7 +4,7 @@ build-bot:
 		sh -c "clear && go mod tidy && go mod vendor && go build -o bin/mev-bot-v2-alpha cmd/bot-v2-alpha/main.go"
 
 build-contracts:
-	@docker compose run -rm --remove-orphans  smart-contracts-dev \
+	@docker compose run --rm --remove-orphans  smart-contracts-dev \
 	    "forge build --force --skip test --skip script/Bindings-0.7.sol"
 
 generate-contract-bindings:
