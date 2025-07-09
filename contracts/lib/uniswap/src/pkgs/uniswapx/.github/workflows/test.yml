@@ -1,0 +1,46 @@
+name: unit-test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  unit-tests:
+    name: Foundry project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.1.0
+
+      - name: Build Calibur submodule
+        run: |
+          cd lib/calibur
+          forge build
+        id: build-calibur
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      - name: Check fmt
+        run: |
+          forge fmt --check
+        id: fmt
+
+      - name: Run Forge unit tests
+        run: |
+          forge test -vvv
+        id: test
