@@ -6,7 +6,7 @@ vendor/
 */.env.*
 !*/.env.sample
 */vendor/
-smart-contracts/lib/
+contracts/lib/
 # Generated files
 codebase_go.txt
 codebase_sol.txt
