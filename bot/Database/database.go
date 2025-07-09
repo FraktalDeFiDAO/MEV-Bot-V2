@@ -89,43 +89,61 @@ func (w *DBWriter) Run() {
 		case req := <-w.WriteQueue:
 			w.batch = append(w.batch, req)
 			if len(w.batch) >= 100 { // Commit if batch size is reached
-				w.commitBatch()
+				if err := w.commitBatch(); err != nil {
+					log.Printf("DB Writer: batch commit failed: %v", err)
+				}
 			}
 		case <-w.batchTicker.C:
 			if len(w.batch) > 0 { // Commit on a timer
-				w.commitBatch()
+				if err := w.commitBatch(); err != nil {
+					log.Printf("DB Writer: batch commit failed: %v", err)
+				}
 			}
 		}
 	}
 }
 
 // commitBatch processes the current batch of write requests in a single DB transaction.
-func (w *DBWriter) commitBatch() {
+func (w *DBWriter) commitBatch() error {
 	tx, err := w.db.Begin()
 	if err != nil {
 		log.Printf("DB Writer: Error starting transaction: %v", err)
-		return
+		return err
 	}
 
 	for _, req := range w.batch {
+		var wErr error
 		switch req.Type {
 		case SaveTokenRequest:
-			w.saveToken(tx, req.Token)
+			wErr = w.saveToken(tx, req.Token)
 		case SavePoolRequest:
-			w.savePool(tx, req.Pool)
+			wErr = w.savePool(tx, req.Pool)
 		case SaveV2SwapRequest:
-			w.saveV2Swap(tx, req.V2Swap)
+			wErr = w.saveV2Swap(tx, req.V2Swap)
 		case SaveV3SwapRequest:
-			w.saveV3Swap(tx, req.V3Swap)
+			wErr = w.saveV3Swap(tx, req.V3Swap)
 		case SaveOpportunityRequest:
-			w.saveArbitrageOpportunity(tx, req.Opportunity)
+			wErr = w.saveArbitrageOpportunity(tx, req.Opportunity)
+		}
+		if wErr != nil {
+			log.Printf("DB Writer: Rolling back transaction due to error: %v", wErr)
+			if rbErr := tx.Rollback(); rbErr != nil {
+				log.Printf("DB Writer: Error during rollback: %v", rbErr)
+			}
+			w.batch = w.batch[:0]
+			return wErr
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
 		log.Printf("DB Writer: Error committing transaction: %v", err)
+		if rbErr := tx.Rollback(); rbErr != nil {
+			log.Printf("DB Writer: Error during rollback: %v", rbErr)
+		}
+		return err
 	}
 	w.batch = w.batch[:0] // Clear the batch
+	return nil
 }
 
 // migrate creates the database schema if it doesn't exist.
@@ -234,44 +252,49 @@ func (w *DBWriter) LoadInitialData() ([]PoolRecord, []TokenRecord, error) {
 }
 
 // saveToken, savePool, etc., now operate on a transaction.
-func (w *DBWriter) saveToken(tx *sql.Tx, token *TokenRecord) {
+func (w *DBWriter) saveToken(tx *sql.Tx, token *TokenRecord) error {
 	stmt := `INSERT OR IGNORE INTO tokens (address, symbol, decimals) VALUES (?, ?, ?)`
 	_, err := tx.Exec(stmt, strings.ToLower(token.Address), token.Symbol, token.Decimals)
 	if err != nil {
-		log.Printf("DB Writer: Error saving token %s: %v", token.Address, err)
+		return fmt.Errorf("error saving token %s: %w", token.Address, err)
 	}
+	return nil
 }
 
-func (w *DBWriter) savePool(tx *sql.Tx, pool *PoolRecord) {
+func (w *DBWriter) savePool(tx *sql.Tx, pool *PoolRecord) error {
 	stmt := `INSERT OR IGNORE INTO pools (address, protocol, factory, fee, address_ticker, symbol_ticker, token0_address, token1_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := tx.Exec(stmt, strings.ToLower(pool.Address), pool.Protocol, pool.Factory, pool.Fee, pool.AddressTicker, pool.SymbolTicker, strings.ToLower(pool.Token0Address), strings.ToLower(pool.Token1Address))
 	if err != nil {
-		log.Printf("DB Writer: Error saving pool %s: %v", pool.Address, err)
+		return fmt.Errorf("error saving pool %s: %w", pool.Address, err)
 	}
+	return nil
 }
 
-func (w *DBWriter) saveV2Swap(tx *sql.Tx, record *V2SwapRecord) {
+func (w *DBWriter) saveV2Swap(tx *sql.Tx, record *V2SwapRecord) error {
 	stmt := `INSERT OR IGNORE INTO v2_swaps (tx_hash, log_index, pool_address, sender, recipient, amount0_in, amount1_in, amount0_out, amount1_out) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := tx.Exec(stmt, record.TxHash.Hex(), record.LogIndex, record.PoolAddress.Hex(), record.Swap.Sender.Hex(), record.Swap.To.Hex(), record.Swap.Amount0In.String(), record.Swap.Amount1In.String(), record.Swap.Amount0Out.String(), record.Swap.Amount1Out.String())
 	if err != nil {
-		log.Printf("DB Writer: Error saving V2 swap for tx %s: %v", record.TxHash.Hex(), err)
+		return fmt.Errorf("error saving V2 swap for tx %s: %w", record.TxHash.Hex(), err)
 	}
+	return nil
 }
 
-func (w *DBWriter) saveV3Swap(tx *sql.Tx, record *V3SwapRecord) {
+func (w *DBWriter) saveV3Swap(tx *sql.Tx, record *V3SwapRecord) error {
 	stmt := `INSERT OR IGNORE INTO v3_swaps (tx_hash, log_index, pool_address, sender, recipient, amount0, amount1, tick) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := tx.Exec(stmt, record.TxHash.Hex(), record.LogIndex, record.PoolAddress.Hex(), record.Swap.Sender.Hex(), record.Swap.Recipient.Hex(), record.Swap.Amount0.String(), record.Swap.Amount1.String(), record.Swap.Tick.String())
 	if err != nil {
-		log.Printf("DB Writer: Error saving V3 swap for tx %s: %v", record.TxHash.Hex(), err)
+		return fmt.Errorf("error saving V3 swap for tx %s: %w", record.TxHash.Hex(), err)
 	}
+	return nil
 }
 
-func (w *DBWriter) saveArbitrageOpportunity(tx *sql.Tx, op *Opportunity) {
+func (w *DBWriter) saveArbitrageOpportunity(tx *sql.Tx, op *Opportunity) error {
 	stmt := `INSERT INTO arbitrage_opportunities (symbol_ticker, pool_a_address, pool_a_protocol, pool_a_factory, pool_a_price, pool_a_fee, pool_b_address, pool_b_protocol, pool_b_factory, pool_b_price, pool_b_fee, percent_diff, token0_address, token1_address, token0_symbol, token1_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := tx.Exec(stmt, op.SymbolTicker, op.PoolA.Address, op.PoolA.Protocol, op.PoolA.Factory, op.PoolA.Price, op.PoolA.Fee, op.PoolB.Address, op.PoolB.Protocol, op.PoolB.Factory, op.PoolB.Price, op.PoolB.Fee, op.PercentDiff, op.Token0Address, op.Token1Address, op.Token0Symbol, op.Token1Symbol)
 	if err != nil {
-		log.Printf("DB Writer: Error saving arbitrage opportunity for ticker %s: %v", op.SymbolTicker, err)
+		return fmt.Errorf("error saving arbitrage opportunity for ticker %s: %w", op.SymbolTicker, err)
 	}
+	return nil
 }
 
 // Structs for DB records, kept internal to the package.
