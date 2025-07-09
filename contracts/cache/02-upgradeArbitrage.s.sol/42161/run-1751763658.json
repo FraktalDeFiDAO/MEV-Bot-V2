@@ -1,0 +1,10 @@
+{
+  "transactions": [
+    {
+      "rpc": "wss://arbitrum-mainnet.core.chainstack.com/caff58d6e1cd94251445b95104e47a01"
+    },
+    {
+      "rpc": "wss://arbitrum-mainnet.core.chainstack.com/caff58d6e1cd94251445b95104e47a01"
+    }
+  ]
+}

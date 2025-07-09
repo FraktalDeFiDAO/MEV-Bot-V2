@@ -10,9 +10,9 @@ build-contracts:
 generate-contract-bindings:
 	@sh -c "./generate_bindings.sh"
 
-run-dev: 
+run-dev:
 	@${MAKE} build-bot && \
-		${MAKE} run-bot 
+		${MAKE} run-bot
 
 run-bot:
 	@echo "Running bot with local anvil"

@@ -63,7 +63,7 @@ func LoadConfig() (config Config, err error) {
 
 	// Hide the private key from any logs for security.
 	log.Println("Configuration loaded successfully.")
-	log.Printf("Using ETH RPC URL: %s", config.EthRPCURL)
+        log.Printf("Using ETH RPC URL: %s", config.EthRPCURL)
 
 	return
 }

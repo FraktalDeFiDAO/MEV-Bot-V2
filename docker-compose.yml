@@ -34,7 +34,7 @@ services:
     working_dir: /home/foundry/app
     # Set the RPC_URL so you can run scripts inside the container against Anvil
     environment:
-      - RPC_URL=http://anvil:8545 
+      - RPC_URL=http://anvil:8545
     env_file:
       - .env
     user: root
