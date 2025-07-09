@@ -5,6 +5,8 @@ libs = ['lib', "dependencies"]
 fuzz_runs = 256
 ffi = true
 via_ir = true
+solc_version = '0.8.28'
+auto_detect_solc = true
 fs_permissions = [{ access = "read", path = "./broadcast"}]
  
 # remappings = ["@openzeppelin/=lib/openzeppelin-contracts/" ,"@chainlink/=lib/chainlink/"]
@@ -24,5 +26,4 @@ line_length = 120
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
 mainnet2 = { key = "ABCDEFG", chain = "mainnet" }
 optimism = { key = "1234567" }
-unknown_chain = { key = "ABCDEFG", url = "<etherscan api url for this chain>" }
-arbitrum = { key = "${ARBISCAN_API_KEY}" }
+unknown_chain = { key = "ABCDEFG", url = "<etherscan api url for this chain>" }arbitrum = { key = "${ARBISCAN_API_KEY}" }
