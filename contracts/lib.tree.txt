@@ -1,0 +1,2159 @@
+lib/cryptoalgebra/Algebra/direction-based-fee/src
+├── core
+│   ├── contracts
+│   │   ├── AlgebraFactory.sol
+│   │   ├── AlgebraPoolDeployer.sol
+│   │   ├── AlgebraPool.sol
+│   │   ├── base
+│   │   │   ├── PoolImmutables.sol
+│   │   │   └── PoolState.sol
+│   │   ├── DataStorageOperator.sol
+│   │   ├── interfaces
+│   │   │   ├── callback
+│   │   │   │   ├── IAlgebraFlashCallback.sol
+│   │   │   │   ├── IAlgebraMintCallback.sol
+│   │   │   │   └── IAlgebraSwapCallback.sol
+│   │   │   ├── IAlgebraFactory.sol
+│   │   │   ├── IAlgebraPoolDeployer.sol
+│   │   │   ├── IAlgebraPool.sol
+│   │   │   ├── IAlgebraVirtualPool.sol
+│   │   │   ├── IDataStorageOperator.sol
+│   │   │   ├── IERC20Minimal.sol
+│   │   │   └── pool
+│   │   │       ├── IAlgebraPoolActions.sol
+│   │   │       ├── IAlgebraPoolDerivedState.sol
+│   │   │       ├── IAlgebraPoolEvents.sol
+│   │   │       ├── IAlgebraPoolImmutables.sol
+│   │   │       ├── IAlgebraPoolPermissionedActions.sol
+│   │   │       └── IAlgebraPoolState.sol
+│   │   ├── libraries
+│   │   │   ├── AdaptiveFee.sol
+│   │   │   ├── Constants.sol
+│   │   │   ├── DataStorage.sol
+│   │   │   ├── FullMath.sol
+│   │   │   ├── LICENSE_GPL
+│   │   │   ├── LICENSE_MIT
+│   │   │   ├── LiquidityMath.sol
+│   │   │   ├── LowGasSafeMath.sol
+│   │   │   ├── PriceMovementMath.sol
+│   │   │   ├── SafeCast.sol
+│   │   │   ├── Sqrt.sol
+│   │   │   ├── TickManager.sol
+│   │   │   ├── TickMath.sol
+│   │   │   ├── TickTable.sol
+│   │   │   ├── TokenDeltaMath.sol
+│   │   │   └── TransferHelper.sol
+│   │   └── test
+│   │       ├── AdaptiveFeeEchidnaTest.sol
+│   │       ├── AdaptiveFeeTest.sol
+│   │       ├── AlgebraPoolSwapTest.sol
+│   │       ├── BitMathEchidnaTest.sol
+│   │       ├── BitMathTest.sol
+│   │       ├── DataStorageEchidnaTest.sol
+│   │       ├── DataStorageTest.sol
+│   │       ├── FullMathEchidnaTest.sol
+│   │       ├── FullMathTest.sol
+│   │       ├── LiquidityAmounts.sol
+│   │       ├── LiquidityMathTest.sol
+│   │       ├── LowGasSafeMathEchidnaTest.sol
+│   │       ├── MockTimeAlgebraPoolDeployer.sol
+│   │       ├── MockTimeAlgebraPool.sol
+│   │       ├── MockTimeVirtualPool.sol
+│   │       ├── PriceMovementMathEchidnaTest.sol
+│   │       ├── PriceMovementMathTest.sol
+│   │       ├── SafeMathTest.sol
+│   │       ├── simulation
+│   │       │   ├── SimulationTimeAlgebraPool.sol
+│   │       │   ├── SimulationTimeFactory.sol
+│   │       │   └── SimulationTimePoolDeployer.sol
+│   │       ├── TestAlgebraCallee.sol
+│   │       ├── TestAlgebraReentrantCallee.sol
+│   │       ├── TestAlgebraRouter.sol
+│   │       ├── TestAlgebraSwapPay.sol
+│   │       ├── TestERC20.sol
+│   │       ├── TickMathEchidnaTest.sol
+│   │       ├── TickMathTest.sol
+│   │       ├── TickOverflowSafetyEchidnaTest.sol
+│   │       ├── TickTableEchidnaTest.sol
+│   │       ├── TickTableTest.sol
+│   │       ├── TickTest.sol
+│   │       ├── TokenDeltaMathEchidnaTest.sol
+│   │       ├── TokenDeltaMathTest.sol
+│   │       └── UnsafeMathEchidnaTest.sol
+│   ├── echidna.config.yml
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── README.md
+│   ├── scripts
+│   │   ├── deploy.js
+│   │   ├── getOracleData.js
+│   │   └── Simulation.ts
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── AdaptiveFee.spec.ts
+│   │   ├── AlgebraFactory.spec.ts
+│   │   ├── AlgebraPool.arbitrage.spec.ts
+│   │   ├── AlgebraPool.gas.spec.ts
+│   │   ├── AlgebraPool.spec.ts
+│   │   ├── AlgebraPool.swaps.spec.ts
+│   │   ├── AlgebraRouter.spec.ts
+│   │   ├── BitMath.spec.ts
+│   │   ├── DataStorage.spec.ts
+│   │   ├── LiquidityMath.spec.ts
+│   │   ├── Math.spec.ts
+│   │   ├── PriceMovement.spec.ts
+│   │   ├── shared
+│   │   │   ├── checkTimepointEquals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── fixtures.ts
+│   │   │   ├── format.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   └── utilities.ts
+│   │   ├── __snapshots__
+│   │   │   ├── AdaptiveFee.spec.ts.snap
+│   │   │   ├── AlgebraFactory.spec.ts.snap
+│   │   │   ├── AlgebraPool.arbitrage.spec.ts.snap
+│   │   │   ├── AlgebraPool.gas.spec.ts.snap
+│   │   │   ├── AlgebraPool.spec.ts.snap
+│   │   │   ├── AlgebraPool.swaps.spec.ts.snap
+│   │   │   ├── BitMath.spec.ts.snap
+│   │   │   ├── DataStorage.spec.ts.snap
+│   │   │   ├── LiquidityMath.spec.ts.snap
+│   │   │   ├── PriceMovement.spec.ts.snap
+│   │   │   ├── TickTable.spec.ts.snap
+│   │   │   └── TokenDeltaMath.spec.ts.snap
+│   │   ├── Tick.spec.ts
+│   │   ├── TickTable.spec.ts
+│   │   └── TokenDeltaMath.spec.ts
+│   └── tsconfig.json
+├── periphery
+│   ├── contracts
+│   │   ├── base
+│   │   │   ├── BlockTimestamp.sol
+│   │   │   ├── ERC721Permit.sol
+│   │   │   ├── LiquidityManagement.sol
+│   │   │   ├── Multicall.sol
+│   │   │   ├── PeripheryImmutableState.sol
+│   │   │   ├── PeripheryPayments.sol
+│   │   │   ├── PeripheryPaymentsWithFee.sol
+│   │   │   ├── PeripheryValidation.sol
+│   │   │   ├── PoolInitializer.sol
+│   │   │   └── SelfPermit.sol
+│   │   ├── interfaces
+│   │   │   ├── external
+│   │   │   │   ├── IERC1271.sol
+│   │   │   │   ├── IERC20PermitAllowed.sol
+│   │   │   │   └── IWNativeToken.sol
+│   │   │   ├── IERC20Metadata.sol
+│   │   │   ├── IERC721Permit.sol
+│   │   │   ├── IMulticall.sol
+│   │   │   ├── INonfungiblePositionManager.sol
+│   │   │   ├── INonfungibleTokenPositionDescriptor.sol
+│   │   │   ├── IPeripheryImmutableState.sol
+│   │   │   ├── IPeripheryPayments.sol
+│   │   │   ├── IPeripheryPaymentsWithFee.sol
+│   │   │   ├── IPoolInitializer.sol
+│   │   │   ├── IQuoter.sol
+│   │   │   ├── IQuoterV2.sol
+│   │   │   ├── ISelfPermit.sol
+│   │   │   ├── ISwapRouter.sol
+│   │   │   ├── ITickLens.sol
+│   │   │   └── IV3Migrator.sol
+│   │   ├── lens
+│   │   │   ├── AlgebraInterfaceMulticall.sol
+│   │   │   ├── Quoter.sol
+│   │   │   ├── QuoterV2.sol
+│   │   │   ├── README.md
+│   │   │   └── TickLens.sol
+│   │   ├── libraries
+│   │   │   ├── AddressStringUtil.sol
+│   │   │   ├── BytesLib.sol
+│   │   │   ├── CallbackValidation.sol
+│   │   │   ├── ChainId.sol
+│   │   │   ├── DataStorageLibrary.sol
+│   │   │   ├── HexStrings.sol
+│   │   │   ├── LiquidityAmounts.sol
+│   │   │   ├── NFTDescriptor.sol
+│   │   │   ├── NFTSVG.sol
+│   │   │   ├── Path.sol
+│   │   │   ├── PoolAddress.sol
+│   │   │   ├── PoolTicksCounter.sol
+│   │   │   ├── PositionKey.sol
+│   │   │   ├── SafeERC20Namer.sol
+│   │   │   ├── TokenRatioSortOrder.sol
+│   │   │   ├── TransferHelper.sol
+│   │   │   └── WeightedDataStorageLibrary.sol
+│   │   ├── NonfungiblePositionManager.sol
+│   │   ├── NonfungibleTokenPositionDescriptor.sol
+│   │   ├── SwapRouter.sol
+│   │   ├── test
+│   │   │   ├── Base64Test.sol
+│   │   │   ├── LiquidityAmountsTest.sol
+│   │   │   ├── MockObservable.sol
+│   │   │   ├── MockTimeNonfungiblePositionManager.sol
+│   │   │   ├── MockTimeSwapRouter.sol
+│   │   │   ├── NFTDescriptorTest.sol
+│   │   │   ├── NonfungiblePositionManagerPositionsGasTest.sol
+│   │   │   ├── OracleTest.sol
+│   │   │   ├── PathTest.sol
+│   │   │   ├── PeripheryImmutableStateTest.sol
+│   │   │   ├── PoolAddressTest.sol
+│   │   │   ├── PoolTicksCounterTest.sol
+│   │   │   ├── SelfPermitTest.sol
+│   │   │   ├── TestAlgebraCallee.sol
+│   │   │   ├── TestCallbackValidation.sol
+│   │   │   ├── TestERC20Metadata.sol
+│   │   │   ├── TestERC20PermitAllowed.sol
+│   │   │   ├── TestERC20.sol
+│   │   │   ├── TestMulticall.sol
+│   │   │   ├── TestPositionNFTOwner.sol
+│   │   │   ├── TickLensTest.sol
+│   │   │   └── WeightedOracleTest.sol
+│   │   └── V3Migrator.sol
+│   ├── coverage.json
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── scripts
+│   │   └── deploy.js
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── Base64.spec.ts
+│   │   ├── CallbackValidation.spec.ts
+│   │   ├── contracts
+│   │   │   └── WNativeToken.json
+│   │   ├── LiquidityAmounts.spec.ts
+│   │   ├── Multicall.spec.ts
+│   │   ├── NFTDescriptor.spec.ts
+│   │   ├── NonfungiblePositionManager.spec.ts
+│   │   ├── NonfungibleTokenPositionDescriptor.spec.ts
+│   │   ├── OracleLibrary.spec.ts
+│   │   ├── Path.spec.ts
+│   │   ├── PeripheryImmutableState.spec.ts
+│   │   ├── PoolAddress.spec.ts
+│   │   ├── PoolTicksCounter.spec.ts
+│   │   ├── Quoter.spec.ts
+│   │   ├── QuoterV2.spec.ts
+│   │   ├── SelfPermit.spec.ts
+│   │   ├── shared
+│   │   │   ├── base64.ts
+│   │   │   ├── completeFixture.ts
+│   │   │   ├── computePoolAddress.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── encodePriceSqrt.ts
+│   │   │   ├── expandTo18Decimals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── externalFixtures.ts
+│   │   │   ├── extractJSONFromURI.ts
+│   │   │   ├── formatSqrtRatioX96.spec.ts
+│   │   │   ├── formatSqrtRatioX96.ts
+│   │   │   ├── getPermitNFTSignature.ts
+│   │   │   ├── path.ts
+│   │   │   ├── permit.ts
+│   │   │   ├── poolAtAddress.ts
+│   │   │   ├── quoter.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   ├── ticks.ts
+│   │   │   └── tokenSort.ts
+│   │   ├── __snapshots__
+│   │   │   ├── Base64.spec.ts.snap
+│   │   │   ├── LiquidityAmounts.spec.ts.snap
+│   │   │   ├── Multicall.spec.ts.snap
+│   │   │   ├── NFTDescriptor.spec.ts.snap
+│   │   │   ├── NFTDescriptor.svg
+│   │   │   ├── NonfungiblePositionManager.spec.ts.snap
+│   │   │   ├── OracleLibrary.spec.ts.snap
+│   │   │   ├── Path.spec.ts.snap
+│   │   │   ├── PeripheryImmutableState.spec.ts.snap
+│   │   │   ├── PoolAddress.spec.ts.snap
+│   │   │   ├── QuoterV2.spec.ts.snap
+│   │   │   ├── SwapRouter.spec.ts.snap
+│   │   │   ├── TickLens.spec.ts.snap
+│   │   │   └── V3Migrator.spec.ts.snap
+│   │   ├── SwapRouter.spec.ts
+│   │   ├── TickLens.spec.ts
+│   │   ├── V3Migrator.spec.ts
+│   │   └── WeightedOracleLibrary.spec.ts
+│   └── tsconfig.json
+└── tokenomics
+    ├── contracts
+    │   ├── AlgebraTokenStaking.sol
+    │   ├── AlgebraVault.sol
+    │   ├── base
+    │   │   ├── ERC20.sol
+    │   │   ├── FreezableToken.sol
+    │   │   └── PeripheryPayments.sol
+    │   ├── FarmingCenter.sol
+    │   ├── FarmingCenterVault.sol
+    │   ├── farmings
+    │   │   ├── AlgebraFarming.sol
+    │   │   ├── AlgebraVirtualPoolBase.sol
+    │   │   ├── eternalFarming
+    │   │   │   ├── AlgebraEternalFarming.sol
+    │   │   │   ├── EternalVirtualPool.sol
+    │   │   │   └── interfaces
+    │   │   │       ├── IAlgebraEternalFarming.sol
+    │   │   │       └── IAlgebraEternalVirtualPool.sol
+    │   │   ├── IAlgebraVirtualPoolBase.sol
+    │   │   └── limitFarming
+    │   │       ├── AlgebraLimitFarming.sol
+    │   │       ├── interfaces
+    │   │       │   ├── IAlgebraLimitFarming.sol
+    │   │       │   └── IAlgebraLimitVirtualPool.sol
+    │   │       └── LimitVirtualPool.sol
+    │   ├── interfaces
+    │   │   ├── IAlgebraFarming.sol
+    │   │   ├── IERC20Freezable.sol
+    │   │   ├── IFarmingCenter.sol
+    │   │   ├── IFarmingCenterVault.sol
+    │   │   └── IIncentiveKey.sol
+    │   ├── libraries
+    │   │   ├── IncentiveId.sol
+    │   │   ├── LiquidityTier.sol
+    │   │   ├── NFTPositionInfo.sol
+    │   │   └── RewardMath.sol
+    │   ├── LICENSE
+    │   └── test
+    │       ├── TestERC20.sol
+    │       ├── TestIncentiveId.sol
+    │       └── TestRewardMath.sol
+    ├── hardhat.config.ts
+    ├── LICENSE
+    ├── package.json
+    ├── package-lock.json
+    ├── README.md
+    ├── scripts
+    │   ├── deploy.js
+    │   ├── deployStaking.js
+    │   └── deployVault.js
+    ├── slither.config.json
+    ├── test
+    │   ├── AlgebraFarming.spec.ts
+    │   ├── AlgebraTokenStaking.spec.ts
+    │   ├── AlgebraVault.spec.ts
+    │   ├── helpers
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── matchers
+    │   │   └── beWithin.ts
+    │   ├── shared
+    │   │   ├── actors.ts
+    │   │   ├── completeFixture.ts
+    │   │   ├── external
+    │   │   │   ├── v3-periphery
+    │   │   │   │   ├── constants.ts
+    │   │   │   │   ├── ticks.ts
+    │   │   │   │   └── tokenSort.ts
+    │   │   │   └── WNativeToken.json
+    │   │   ├── externalFixtures.ts
+    │   │   ├── fixtures.ts
+    │   │   ├── index.ts
+    │   │   ├── linkLibraries.ts
+    │   │   ├── logging.ts
+    │   │   ├── provider.ts
+    │   │   ├── ticks.ts
+    │   │   └── time.ts
+    │   ├── types.ts
+    │   └── unit
+    │       ├── Deployment.spec.ts
+    │       ├── Deposits.spec.ts
+    │       ├── EternalFarms.spec.ts
+    │       ├── FarmingCenter.spec.ts
+    │       ├── FarmingCenterVault.ts
+    │       ├── Farms.spec.ts
+    │       ├── Incentives.spec.ts
+    │       ├── Multicall.spec.ts
+    │       ├── RewardMath
+    │       │   └── RewardMath.spec.ts
+    │       └── __snapshots__
+    │           ├── Deposits.spec.ts.snap
+    │           ├── EternalFarms.spec.ts.snap
+    │           ├── FarmingCenter.spec.ts.snap
+    │           ├── Farms.spec.ts.snap
+    │           └── Incentives.spec.ts.snap
+    ├── tsconfig.json
+    └── types
+        └── contractParams.ts
+lib/cryptoalgebra/Algebra/direction-based-fee-v2/src
+├── core
+│   ├── contracts
+│   │   ├── AlgebraFactory.sol
+│   │   ├── AlgebraPoolDeployer.sol
+│   │   ├── AlgebraPool.sol
+│   │   ├── base
+│   │   │   ├── PoolImmutables.sol
+│   │   │   └── PoolState.sol
+│   │   ├── DataStorageOperator.sol
+│   │   ├── interfaces
+│   │   │   ├── callback
+│   │   │   │   ├── IAlgebraFlashCallback.sol
+│   │   │   │   ├── IAlgebraMintCallback.sol
+│   │   │   │   └── IAlgebraSwapCallback.sol
+│   │   │   ├── IAlgebraFactory.sol
+│   │   │   ├── IAlgebraPoolDeployer.sol
+│   │   │   ├── IAlgebraPool.sol
+│   │   │   ├── IAlgebraVirtualPool.sol
+│   │   │   ├── IDataStorageOperator.sol
+│   │   │   ├── IERC20Minimal.sol
+│   │   │   └── pool
+│   │   │       ├── IAlgebraPoolActions.sol
+│   │   │       ├── IAlgebraPoolDerivedState.sol
+│   │   │       ├── IAlgebraPoolEvents.sol
+│   │   │       ├── IAlgebraPoolImmutables.sol
+│   │   │       ├── IAlgebraPoolPermissionedActions.sol
+│   │   │       └── IAlgebraPoolState.sol
+│   │   ├── libraries
+│   │   │   ├── AdaptiveFee.sol
+│   │   │   ├── Constants.sol
+│   │   │   ├── DataStorage.sol
+│   │   │   ├── FullMath.sol
+│   │   │   ├── LICENSE_GPL
+│   │   │   ├── LICENSE_MIT
+│   │   │   ├── LiquidityMath.sol
+│   │   │   ├── LowGasSafeMath.sol
+│   │   │   ├── PriceMovementMath.sol
+│   │   │   ├── SafeCast.sol
+│   │   │   ├── Sqrt.sol
+│   │   │   ├── TickManager.sol
+│   │   │   ├── TickMath.sol
+│   │   │   ├── TickTable.sol
+│   │   │   ├── TokenDeltaMath.sol
+│   │   │   └── TransferHelper.sol
+│   │   └── test
+│   │       ├── AdaptiveFeeEchidnaTest.sol
+│   │       ├── AdaptiveFeeTest.sol
+│   │       ├── AlgebraPoolSwapTest.sol
+│   │       ├── BitMathEchidnaTest.sol
+│   │       ├── BitMathTest.sol
+│   │       ├── DataStorageEchidnaTest.sol
+│   │       ├── DataStorageTest.sol
+│   │       ├── FullMathEchidnaTest.sol
+│   │       ├── FullMathTest.sol
+│   │       ├── LiquidityAmounts.sol
+│   │       ├── LiquidityMathTest.sol
+│   │       ├── LowGasSafeMathEchidnaTest.sol
+│   │       ├── MockTimeAlgebraPoolDeployer.sol
+│   │       ├── MockTimeAlgebraPool.sol
+│   │       ├── MockTimeVirtualPool.sol
+│   │       ├── PriceMovementMathEchidnaTest.sol
+│   │       ├── PriceMovementMathTest.sol
+│   │       ├── SafeMathTest.sol
+│   │       ├── simulation
+│   │       │   ├── SimulationTimeAlgebraPool.sol
+│   │       │   ├── SimulationTimeFactory.sol
+│   │       │   └── SimulationTimePoolDeployer.sol
+│   │       ├── TestAlgebraCallee.sol
+│   │       ├── TestAlgebraReentrantCallee.sol
+│   │       ├── TestAlgebraRouter.sol
+│   │       ├── TestAlgebraSwapPay.sol
+│   │       ├── TestERC20.sol
+│   │       ├── TickMathEchidnaTest.sol
+│   │       ├── TickMathTest.sol
+│   │       ├── TickOverflowSafetyEchidnaTest.sol
+│   │       ├── TickTableEchidnaTest.sol
+│   │       ├── TickTableTest.sol
+│   │       ├── TickTest.sol
+│   │       ├── TokenDeltaMathEchidnaTest.sol
+│   │       ├── TokenDeltaMathTest.sol
+│   │       └── UnsafeMathEchidnaTest.sol
+│   ├── echidna.config.yml
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── README.md
+│   ├── scripts
+│   │   ├── deploy.js
+│   │   ├── getOracleData.js
+│   │   └── Simulation.ts
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── AdaptiveFee.spec.ts
+│   │   ├── AlgebraFactory.spec.ts
+│   │   ├── AlgebraPool.arbitrage.spec.ts
+│   │   ├── AlgebraPool.gas.spec.ts
+│   │   ├── AlgebraPool.spec.ts
+│   │   ├── AlgebraPool.swaps.spec.ts
+│   │   ├── AlgebraRouter.spec.ts
+│   │   ├── BitMath.spec.ts
+│   │   ├── DataStorage.spec.ts
+│   │   ├── LiquidityMath.spec.ts
+│   │   ├── Math.spec.ts
+│   │   ├── PriceMovement.spec.ts
+│   │   ├── shared
+│   │   │   ├── checkTimepointEquals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── fixtures.ts
+│   │   │   ├── format.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   └── utilities.ts
+│   │   ├── __snapshots__
+│   │   │   ├── AdaptiveFee.spec.ts.snap
+│   │   │   ├── AlgebraFactory.spec.ts.snap
+│   │   │   ├── AlgebraPool.arbitrage.spec.ts.snap
+│   │   │   ├── AlgebraPool.gas.spec.ts.snap
+│   │   │   ├── AlgebraPool.spec.ts.snap
+│   │   │   ├── AlgebraPool.swaps.spec.ts.snap
+│   │   │   ├── BitMath.spec.ts.snap
+│   │   │   ├── DataStorage.spec.ts.snap
+│   │   │   ├── LiquidityMath.spec.ts.snap
+│   │   │   ├── PriceMovement.spec.ts.snap
+│   │   │   ├── TickTable.spec.ts.snap
+│   │   │   └── TokenDeltaMath.spec.ts.snap
+│   │   ├── Tick.spec.ts
+│   │   ├── TickTable.spec.ts
+│   │   └── TokenDeltaMath.spec.ts
+│   └── tsconfig.json
+├── periphery
+│   ├── contracts
+│   │   ├── base
+│   │   │   ├── BlockTimestamp.sol
+│   │   │   ├── ERC721Permit.sol
+│   │   │   ├── LiquidityManagement.sol
+│   │   │   ├── Multicall.sol
+│   │   │   ├── PeripheryImmutableState.sol
+│   │   │   ├── PeripheryPayments.sol
+│   │   │   ├── PeripheryPaymentsWithFee.sol
+│   │   │   ├── PeripheryValidation.sol
+│   │   │   ├── PoolInitializer.sol
+│   │   │   └── SelfPermit.sol
+│   │   ├── interfaces
+│   │   │   ├── external
+│   │   │   │   ├── IERC1271.sol
+│   │   │   │   ├── IERC20PermitAllowed.sol
+│   │   │   │   └── IWNativeToken.sol
+│   │   │   ├── IERC20Metadata.sol
+│   │   │   ├── IERC721Permit.sol
+│   │   │   ├── IMulticall.sol
+│   │   │   ├── INonfungiblePositionManager.sol
+│   │   │   ├── INonfungibleTokenPositionDescriptor.sol
+│   │   │   ├── IPeripheryImmutableState.sol
+│   │   │   ├── IPeripheryPayments.sol
+│   │   │   ├── IPeripheryPaymentsWithFee.sol
+│   │   │   ├── IPoolInitializer.sol
+│   │   │   ├── IQuoter.sol
+│   │   │   ├── IQuoterV2.sol
+│   │   │   ├── ISelfPermit.sol
+│   │   │   ├── ISwapRouter.sol
+│   │   │   ├── ITickLens.sol
+│   │   │   └── IV3Migrator.sol
+│   │   ├── lens
+│   │   │   ├── AlgebraInterfaceMulticall.sol
+│   │   │   ├── Quoter.sol
+│   │   │   ├── QuoterV2.sol
+│   │   │   ├── README.md
+│   │   │   └── TickLens.sol
+│   │   ├── libraries
+│   │   │   ├── AddressStringUtil.sol
+│   │   │   ├── BytesLib.sol
+│   │   │   ├── CallbackValidation.sol
+│   │   │   ├── ChainId.sol
+│   │   │   ├── DataStorageLibrary.sol
+│   │   │   ├── HexStrings.sol
+│   │   │   ├── LiquidityAmounts.sol
+│   │   │   ├── NFTDescriptor.sol
+│   │   │   ├── NFTSVG.sol
+│   │   │   ├── Path.sol
+│   │   │   ├── PoolAddress.sol
+│   │   │   ├── PoolTicksCounter.sol
+│   │   │   ├── PositionKey.sol
+│   │   │   ├── SafeERC20Namer.sol
+│   │   │   ├── TokenRatioSortOrder.sol
+│   │   │   ├── TransferHelper.sol
+│   │   │   └── WeightedDataStorageLibrary.sol
+│   │   ├── NonfungiblePositionManager.sol
+│   │   ├── NonfungibleTokenPositionDescriptor.sol
+│   │   ├── SwapRouter.sol
+│   │   ├── test
+│   │   │   ├── Base64Test.sol
+│   │   │   ├── LiquidityAmountsTest.sol
+│   │   │   ├── MockObservable.sol
+│   │   │   ├── MockTimeNonfungiblePositionManager.sol
+│   │   │   ├── MockTimeSwapRouter.sol
+│   │   │   ├── NFTDescriptorTest.sol
+│   │   │   ├── NonfungiblePositionManagerPositionsGasTest.sol
+│   │   │   ├── OracleTest.sol
+│   │   │   ├── PathTest.sol
+│   │   │   ├── PeripheryImmutableStateTest.sol
+│   │   │   ├── PoolAddressTest.sol
+│   │   │   ├── PoolTicksCounterTest.sol
+│   │   │   ├── SelfPermitTest.sol
+│   │   │   ├── TestAlgebraCallee.sol
+│   │   │   ├── TestCallbackValidation.sol
+│   │   │   ├── TestERC20Metadata.sol
+│   │   │   ├── TestERC20PermitAllowed.sol
+│   │   │   ├── TestERC20.sol
+│   │   │   ├── TestMulticall.sol
+│   │   │   ├── TestPositionNFTOwner.sol
+│   │   │   ├── TickLensTest.sol
+│   │   │   └── WeightedOracleTest.sol
+│   │   └── V3Migrator.sol
+│   ├── coverage.json
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── scripts
+│   │   └── deploy.js
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── Base64.spec.ts
+│   │   ├── CallbackValidation.spec.ts
+│   │   ├── contracts
+│   │   │   └── WNativeToken.json
+│   │   ├── LiquidityAmounts.spec.ts
+│   │   ├── Multicall.spec.ts
+│   │   ├── NFTDescriptor.spec.ts
+│   │   ├── NonfungiblePositionManager.spec.ts
+│   │   ├── NonfungibleTokenPositionDescriptor.spec.ts
+│   │   ├── OracleLibrary.spec.ts
+│   │   ├── Path.spec.ts
+│   │   ├── PeripheryImmutableState.spec.ts
+│   │   ├── PoolAddress.spec.ts
+│   │   ├── PoolTicksCounter.spec.ts
+│   │   ├── Quoter.spec.ts
+│   │   ├── QuoterV2.spec.ts
+│   │   ├── SelfPermit.spec.ts
+│   │   ├── shared
+│   │   │   ├── base64.ts
+│   │   │   ├── completeFixture.ts
+│   │   │   ├── computePoolAddress.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── encodePriceSqrt.ts
+│   │   │   ├── expandTo18Decimals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── externalFixtures.ts
+│   │   │   ├── extractJSONFromURI.ts
+│   │   │   ├── formatSqrtRatioX96.spec.ts
+│   │   │   ├── formatSqrtRatioX96.ts
+│   │   │   ├── getPermitNFTSignature.ts
+│   │   │   ├── path.ts
+│   │   │   ├── permit.ts
+│   │   │   ├── poolAtAddress.ts
+│   │   │   ├── quoter.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   ├── ticks.ts
+│   │   │   └── tokenSort.ts
+│   │   ├── __snapshots__
+│   │   │   ├── Base64.spec.ts.snap
+│   │   │   ├── LiquidityAmounts.spec.ts.snap
+│   │   │   ├── Multicall.spec.ts.snap
+│   │   │   ├── NFTDescriptor.spec.ts.snap
+│   │   │   ├── NFTDescriptor.svg
+│   │   │   ├── NonfungiblePositionManager.spec.ts.snap
+│   │   │   ├── OracleLibrary.spec.ts.snap
+│   │   │   ├── Path.spec.ts.snap
+│   │   │   ├── PeripheryImmutableState.spec.ts.snap
+│   │   │   ├── PoolAddress.spec.ts.snap
+│   │   │   ├── QuoterV2.spec.ts.snap
+│   │   │   ├── SwapRouter.spec.ts.snap
+│   │   │   ├── TickLens.spec.ts.snap
+│   │   │   └── V3Migrator.spec.ts.snap
+│   │   ├── SwapRouter.spec.ts
+│   │   ├── TickLens.spec.ts
+│   │   ├── V3Migrator.spec.ts
+│   │   └── WeightedOracleLibrary.spec.ts
+│   └── tsconfig.json
+└── tokenomics
+    ├── contracts
+    │   ├── AlgebraTokenStaking.sol
+    │   ├── AlgebraVault.sol
+    │   ├── base
+    │   │   ├── ERC20.sol
+    │   │   ├── FreezableToken.sol
+    │   │   └── PeripheryPayments.sol
+    │   ├── FarmingCenter.sol
+    │   ├── FarmingCenterVault.sol
+    │   ├── farmings
+    │   │   ├── AlgebraFarming.sol
+    │   │   ├── AlgebraVirtualPoolBase.sol
+    │   │   ├── eternalFarming
+    │   │   │   ├── AlgebraEternalFarming.sol
+    │   │   │   ├── EternalVirtualPool.sol
+    │   │   │   └── interfaces
+    │   │   │       ├── IAlgebraEternalFarming.sol
+    │   │   │       └── IAlgebraEternalVirtualPool.sol
+    │   │   ├── IAlgebraVirtualPoolBase.sol
+    │   │   └── limitFarming
+    │   │       ├── AlgebraLimitFarming.sol
+    │   │       ├── interfaces
+    │   │       │   ├── IAlgebraLimitFarming.sol
+    │   │       │   └── IAlgebraLimitVirtualPool.sol
+    │   │       └── LimitVirtualPool.sol
+    │   ├── interfaces
+    │   │   ├── IAlgebraFarming.sol
+    │   │   ├── IERC20Freezable.sol
+    │   │   ├── IFarmingCenter.sol
+    │   │   ├── IFarmingCenterVault.sol
+    │   │   └── IIncentiveKey.sol
+    │   ├── libraries
+    │   │   ├── IncentiveId.sol
+    │   │   ├── LiquidityTier.sol
+    │   │   ├── NFTPositionInfo.sol
+    │   │   └── RewardMath.sol
+    │   ├── LICENSE
+    │   └── test
+    │       ├── TestERC20.sol
+    │       ├── TestIncentiveId.sol
+    │       └── TestRewardMath.sol
+    ├── hardhat.config.ts
+    ├── LICENSE
+    ├── package.json
+    ├── package-lock.json
+    ├── README.md
+    ├── scripts
+    │   ├── deploy.js
+    │   ├── deployStaking.js
+    │   └── deployVault.js
+    ├── slither.config.json
+    ├── test
+    │   ├── AlgebraFarming.spec.ts
+    │   ├── AlgebraTokenStaking.spec.ts
+    │   ├── AlgebraVault.spec.ts
+    │   ├── helpers
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── matchers
+    │   │   └── beWithin.ts
+    │   ├── shared
+    │   │   ├── actors.ts
+    │   │   ├── completeFixture.ts
+    │   │   ├── external
+    │   │   │   ├── v3-periphery
+    │   │   │   │   ├── constants.ts
+    │   │   │   │   ├── ticks.ts
+    │   │   │   │   └── tokenSort.ts
+    │   │   │   └── WNativeToken.json
+    │   │   ├── externalFixtures.ts
+    │   │   ├── fixtures.ts
+    │   │   ├── index.ts
+    │   │   ├── linkLibraries.ts
+    │   │   ├── logging.ts
+    │   │   ├── provider.ts
+    │   │   ├── ticks.ts
+    │   │   └── time.ts
+    │   ├── types.ts
+    │   └── unit
+    │       ├── Deployment.spec.ts
+    │       ├── Deposits.spec.ts
+    │       ├── EternalFarms.spec.ts
+    │       ├── FarmingCenter.spec.ts
+    │       ├── FarmingCenterVault.ts
+    │       ├── Farms.spec.ts
+    │       ├── Incentives.spec.ts
+    │       ├── Multicall.spec.ts
+    │       ├── RewardMath
+    │       │   └── RewardMath.spec.ts
+    │       └── __snapshots__
+    │           ├── Deposits.spec.ts.snap
+    │           ├── EternalFarms.spec.ts.snap
+    │           ├── FarmingCenter.spec.ts.snap
+    │           ├── Farms.spec.ts.snap
+    │           └── Incentives.spec.ts.snap
+    ├── tsconfig.json
+    └── types
+        └── contractParams.ts
+lib/cryptoalgebra/Algebra/V1.9-direction-based-fee/src
+├── core
+│   ├── contracts
+│   │   ├── AlgebraFactory.sol
+│   │   ├── AlgebraPoolDeployer.sol
+│   │   ├── AlgebraPool.sol
+│   │   ├── base
+│   │   │   ├── PoolImmutables.sol
+│   │   │   └── PoolState.sol
+│   │   ├── DataStorageOperator.sol
+│   │   ├── interfaces
+│   │   │   ├── callback
+│   │   │   │   ├── IAlgebraFlashCallback.sol
+│   │   │   │   ├── IAlgebraMintCallback.sol
+│   │   │   │   └── IAlgebraSwapCallback.sol
+│   │   │   ├── IAlgebraFactory.sol
+│   │   │   ├── IAlgebraPoolDeployer.sol
+│   │   │   ├── IAlgebraPool.sol
+│   │   │   ├── IAlgebraVirtualPool.sol
+│   │   │   ├── IDataStorageOperator.sol
+│   │   │   ├── IERC20Minimal.sol
+│   │   │   └── pool
+│   │   │       ├── IAlgebraPoolActions.sol
+│   │   │       ├── IAlgebraPoolDerivedState.sol
+│   │   │       ├── IAlgebraPoolEvents.sol
+│   │   │       ├── IAlgebraPoolImmutables.sol
+│   │   │       ├── IAlgebraPoolPermissionedActions.sol
+│   │   │       └── IAlgebraPoolState.sol
+│   │   ├── libraries
+│   │   │   ├── AdaptiveFee.sol
+│   │   │   ├── Constants.sol
+│   │   │   ├── DataStorage.sol
+│   │   │   ├── FullMath.sol
+│   │   │   ├── LICENSE_GPL
+│   │   │   ├── LICENSE_MIT
+│   │   │   ├── LiquidityMath.sol
+│   │   │   ├── LowGasSafeMath.sol
+│   │   │   ├── PriceMovementMath.sol
+│   │   │   ├── SafeCast.sol
+│   │   │   ├── Sqrt.sol
+│   │   │   ├── TickManager.sol
+│   │   │   ├── TickMath.sol
+│   │   │   ├── TickTable.sol
+│   │   │   ├── TokenDeltaMath.sol
+│   │   │   └── TransferHelper.sol
+│   │   └── test
+│   │       ├── AdaptiveFeeEchidnaTest.sol
+│   │       ├── AdaptiveFeeTest.sol
+│   │       ├── AlgebraPoolSwapTest.sol
+│   │       ├── BitMathEchidnaTest.sol
+│   │       ├── BitMathTest.sol
+│   │       ├── DataStorageEchidnaTest.sol
+│   │       ├── DataStorageTest.sol
+│   │       ├── FullMathEchidnaTest.sol
+│   │       ├── FullMathTest.sol
+│   │       ├── LiquidityAmounts.sol
+│   │       ├── LiquidityMathTest.sol
+│   │       ├── LowGasSafeMathEchidnaTest.sol
+│   │       ├── MockTimeAlgebraPoolDeployer.sol
+│   │       ├── MockTimeAlgebraPool.sol
+│   │       ├── MockTimeVirtualPool.sol
+│   │       ├── PriceMovementMathEchidnaTest.sol
+│   │       ├── PriceMovementMathTest.sol
+│   │       ├── SafeMathTest.sol
+│   │       ├── simulation
+│   │       │   ├── SimulationTimeAlgebraPool.sol
+│   │       │   ├── SimulationTimeFactory.sol
+│   │       │   └── SimulationTimePoolDeployer.sol
+│   │       ├── TestAlgebraCallee.sol
+│   │       ├── TestAlgebraReentrantCallee.sol
+│   │       ├── TestAlgebraRouter.sol
+│   │       ├── TestAlgebraSwapPay.sol
+│   │       ├── TestERC20.sol
+│   │       ├── TickMathEchidnaTest.sol
+│   │       ├── TickMathTest.sol
+│   │       ├── TickOverflowSafetyEchidnaTest.sol
+│   │       ├── TickTableEchidnaTest.sol
+│   │       ├── TickTableTest.sol
+│   │       ├── TickTest.sol
+│   │       ├── TokenDeltaMathEchidnaTest.sol
+│   │       ├── TokenDeltaMathTest.sol
+│   │       └── UnsafeMathEchidnaTest.sol
+│   ├── echidna.config.yml
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── README.md
+│   ├── scripts
+│   │   ├── deploy.js
+│   │   ├── getOracleData.js
+│   │   └── Simulation.ts
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── AdaptiveFee.spec.ts
+│   │   ├── AlgebraFactory.spec.ts
+│   │   ├── AlgebraPool.arbitrage.spec.ts
+│   │   ├── AlgebraPool.gas.spec.ts
+│   │   ├── AlgebraPool.spec.ts
+│   │   ├── AlgebraPool.swaps.spec.ts
+│   │   ├── AlgebraRouter.spec.ts
+│   │   ├── BitMath.spec.ts
+│   │   ├── DataStorage.spec.ts
+│   │   ├── LiquidityMath.spec.ts
+│   │   ├── Math.spec.ts
+│   │   ├── PriceMovement.spec.ts
+│   │   ├── shared
+│   │   │   ├── checkTimepointEquals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── fixtures.ts
+│   │   │   ├── format.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   └── utilities.ts
+│   │   ├── __snapshots__
+│   │   │   ├── AdaptiveFee.spec.ts.snap
+│   │   │   ├── AlgebraFactory.spec.ts.snap
+│   │   │   ├── AlgebraPool.arbitrage.spec.ts.snap
+│   │   │   ├── AlgebraPool.gas.spec.ts.snap
+│   │   │   ├── AlgebraPool.spec.ts.snap
+│   │   │   ├── AlgebraPool.swaps.spec.ts.snap
+│   │   │   ├── BitMath.spec.ts.snap
+│   │   │   ├── DataStorage.spec.ts.snap
+│   │   │   ├── LiquidityMath.spec.ts.snap
+│   │   │   ├── PriceMovement.spec.ts.snap
+│   │   │   ├── TickTable.spec.ts.snap
+│   │   │   └── TokenDeltaMath.spec.ts.snap
+│   │   ├── Tick.spec.ts
+│   │   ├── TickTable.spec.ts
+│   │   └── TokenDeltaMath.spec.ts
+│   └── tsconfig.json
+├── periphery
+│   ├── contracts
+│   │   ├── base
+│   │   │   ├── BlockTimestamp.sol
+│   │   │   ├── ERC721Permit.sol
+│   │   │   ├── LiquidityManagement.sol
+│   │   │   ├── Multicall.sol
+│   │   │   ├── PeripheryImmutableState.sol
+│   │   │   ├── PeripheryPayments.sol
+│   │   │   ├── PeripheryPaymentsWithFee.sol
+│   │   │   ├── PeripheryValidation.sol
+│   │   │   ├── PoolInitializer.sol
+│   │   │   └── SelfPermit.sol
+│   │   ├── interfaces
+│   │   │   ├── external
+│   │   │   │   ├── IERC1271.sol
+│   │   │   │   ├── IERC20PermitAllowed.sol
+│   │   │   │   └── IWNativeToken.sol
+│   │   │   ├── IERC20Metadata.sol
+│   │   │   ├── IERC721Permit.sol
+│   │   │   ├── IMulticall.sol
+│   │   │   ├── INonfungiblePositionManager.sol
+│   │   │   ├── INonfungibleTokenPositionDescriptor.sol
+│   │   │   ├── IPeripheryImmutableState.sol
+│   │   │   ├── IPeripheryPayments.sol
+│   │   │   ├── IPeripheryPaymentsWithFee.sol
+│   │   │   ├── IPoolInitializer.sol
+│   │   │   ├── IQuoter.sol
+│   │   │   ├── IQuoterV2.sol
+│   │   │   ├── ISelfPermit.sol
+│   │   │   ├── ISwapRouter.sol
+│   │   │   ├── ITickLens.sol
+│   │   │   └── IV3Migrator.sol
+│   │   ├── lens
+│   │   │   ├── AlgebraInterfaceMulticall.sol
+│   │   │   ├── Quoter.sol
+│   │   │   ├── QuoterV2.sol
+│   │   │   ├── README.md
+│   │   │   └── TickLens.sol
+│   │   ├── libraries
+│   │   │   ├── AddressStringUtil.sol
+│   │   │   ├── BytesLib.sol
+│   │   │   ├── CallbackValidation.sol
+│   │   │   ├── ChainId.sol
+│   │   │   ├── DataStorageLibrary.sol
+│   │   │   ├── HexStrings.sol
+│   │   │   ├── LiquidityAmounts.sol
+│   │   │   ├── NFTDescriptor.sol
+│   │   │   ├── NFTSVG.sol
+│   │   │   ├── Path.sol
+│   │   │   ├── PoolAddress.sol
+│   │   │   ├── PoolTicksCounter.sol
+│   │   │   ├── PositionKey.sol
+│   │   │   ├── SafeERC20Namer.sol
+│   │   │   ├── TokenRatioSortOrder.sol
+│   │   │   ├── TransferHelper.sol
+│   │   │   └── WeightedDataStorageLibrary.sol
+│   │   ├── NonfungiblePositionManager.sol
+│   │   ├── NonfungibleTokenPositionDescriptor.sol
+│   │   ├── SwapRouter.sol
+│   │   ├── test
+│   │   │   ├── Base64Test.sol
+│   │   │   ├── LiquidityAmountsTest.sol
+│   │   │   ├── MockObservable.sol
+│   │   │   ├── MockTimeNonfungiblePositionManager.sol
+│   │   │   ├── MockTimeSwapRouter.sol
+│   │   │   ├── NFTDescriptorTest.sol
+│   │   │   ├── NonfungiblePositionManagerPositionsGasTest.sol
+│   │   │   ├── OracleTest.sol
+│   │   │   ├── PathTest.sol
+│   │   │   ├── PeripheryImmutableStateTest.sol
+│   │   │   ├── PoolAddressTest.sol
+│   │   │   ├── PoolTicksCounterTest.sol
+│   │   │   ├── SelfPermitTest.sol
+│   │   │   ├── TestAlgebraCallee.sol
+│   │   │   ├── TestCallbackValidation.sol
+│   │   │   ├── TestERC20Metadata.sol
+│   │   │   ├── TestERC20PermitAllowed.sol
+│   │   │   ├── TestERC20.sol
+│   │   │   ├── TestMulticall.sol
+│   │   │   ├── TestPositionNFTOwner.sol
+│   │   │   ├── TickLensTest.sol
+│   │   │   └── WeightedOracleTest.sol
+│   │   └── V3Migrator.sol
+│   ├── coverage.json
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── scripts
+│   │   └── deploy.js
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── Base64.spec.ts
+│   │   ├── CallbackValidation.spec.ts
+│   │   ├── contracts
+│   │   │   └── WNativeToken.json
+│   │   ├── LiquidityAmounts.spec.ts
+│   │   ├── Multicall.spec.ts
+│   │   ├── NFTDescriptor.spec.ts
+│   │   ├── NonfungiblePositionManager.spec.ts
+│   │   ├── NonfungibleTokenPositionDescriptor.spec.ts
+│   │   ├── OracleLibrary.spec.ts
+│   │   ├── Path.spec.ts
+│   │   ├── PeripheryImmutableState.spec.ts
+│   │   ├── PoolAddress.spec.ts
+│   │   ├── PoolTicksCounter.spec.ts
+│   │   ├── Quoter.spec.ts
+│   │   ├── QuoterV2.spec.ts
+│   │   ├── SelfPermit.spec.ts
+│   │   ├── shared
+│   │   │   ├── base64.ts
+│   │   │   ├── completeFixture.ts
+│   │   │   ├── computePoolAddress.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── encodePriceSqrt.ts
+│   │   │   ├── expandTo18Decimals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── externalFixtures.ts
+│   │   │   ├── extractJSONFromURI.ts
+│   │   │   ├── formatSqrtRatioX96.spec.ts
+│   │   │   ├── formatSqrtRatioX96.ts
+│   │   │   ├── getPermitNFTSignature.ts
+│   │   │   ├── path.ts
+│   │   │   ├── permit.ts
+│   │   │   ├── poolAtAddress.ts
+│   │   │   ├── quoter.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   ├── ticks.ts
+│   │   │   └── tokenSort.ts
+│   │   ├── __snapshots__
+│   │   │   ├── Base64.spec.ts.snap
+│   │   │   ├── LiquidityAmounts.spec.ts.snap
+│   │   │   ├── Multicall.spec.ts.snap
+│   │   │   ├── NFTDescriptor.spec.ts.snap
+│   │   │   ├── NFTDescriptor.svg
+│   │   │   ├── NonfungiblePositionManager.spec.ts.snap
+│   │   │   ├── OracleLibrary.spec.ts.snap
+│   │   │   ├── Path.spec.ts.snap
+│   │   │   ├── PeripheryImmutableState.spec.ts.snap
+│   │   │   ├── PoolAddress.spec.ts.snap
+│   │   │   ├── QuoterV2.spec.ts.snap
+│   │   │   ├── SwapRouter.spec.ts.snap
+│   │   │   ├── TickLens.spec.ts.snap
+│   │   │   └── V3Migrator.spec.ts.snap
+│   │   ├── SwapRouter.spec.ts
+│   │   ├── TickLens.spec.ts
+│   │   ├── V3Migrator.spec.ts
+│   │   └── WeightedOracleLibrary.spec.ts
+│   └── tsconfig.json
+└── tokenomics
+    ├── contracts
+    │   ├── AlgebraTokenStaking.sol
+    │   ├── AlgebraVault.sol
+    │   ├── base
+    │   │   ├── ERC20.sol
+    │   │   ├── FreezableToken.sol
+    │   │   └── PeripheryPayments.sol
+    │   ├── FarmingCenter.sol
+    │   ├── FarmingCenterVault.sol
+    │   ├── farmings
+    │   │   ├── AlgebraFarming.sol
+    │   │   ├── AlgebraVirtualPoolBase.sol
+    │   │   ├── eternalFarming
+    │   │   │   ├── AlgebraEternalFarming.sol
+    │   │   │   ├── EternalVirtualPool.sol
+    │   │   │   └── interfaces
+    │   │   │       ├── IAlgebraEternalFarming.sol
+    │   │   │       └── IAlgebraEternalVirtualPool.sol
+    │   │   ├── IAlgebraVirtualPoolBase.sol
+    │   │   └── limitFarming
+    │   │       ├── AlgebraLimitFarming.sol
+    │   │       ├── interfaces
+    │   │       │   ├── IAlgebraLimitFarming.sol
+    │   │       │   └── IAlgebraLimitVirtualPool.sol
+    │   │       └── LimitVirtualPool.sol
+    │   ├── interfaces
+    │   │   ├── IAlgebraFarming.sol
+    │   │   ├── IERC20Freezable.sol
+    │   │   ├── IFarmingCenter.sol
+    │   │   ├── IFarmingCenterVault.sol
+    │   │   └── IIncentiveKey.sol
+    │   ├── libraries
+    │   │   ├── IncentiveId.sol
+    │   │   ├── LiquidityTier.sol
+    │   │   ├── NFTPositionInfo.sol
+    │   │   └── RewardMath.sol
+    │   ├── LICENSE
+    │   └── test
+    │       ├── TestERC20.sol
+    │       ├── TestIncentiveId.sol
+    │       └── TestRewardMath.sol
+    ├── hardhat.config.ts
+    ├── LICENSE
+    ├── package.json
+    ├── package-lock.json
+    ├── README.md
+    ├── scripts
+    │   ├── deploy.js
+    │   ├── deployStaking.js
+    │   └── deployVault.js
+    ├── slither.config.json
+    ├── test
+    │   ├── AlgebraFarming.spec.ts
+    │   ├── AlgebraTokenStaking.spec.ts
+    │   ├── AlgebraVault.spec.ts
+    │   ├── helpers
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── matchers
+    │   │   └── beWithin.ts
+    │   ├── shared
+    │   │   ├── actors.ts
+    │   │   ├── completeFixture.ts
+    │   │   ├── external
+    │   │   │   ├── v3-periphery
+    │   │   │   │   ├── constants.ts
+    │   │   │   │   ├── ticks.ts
+    │   │   │   │   └── tokenSort.ts
+    │   │   │   └── WNativeToken.json
+    │   │   ├── externalFixtures.ts
+    │   │   ├── fixtures.ts
+    │   │   ├── index.ts
+    │   │   ├── linkLibraries.ts
+    │   │   ├── logging.ts
+    │   │   ├── provider.ts
+    │   │   ├── ticks.ts
+    │   │   └── time.ts
+    │   ├── types.ts
+    │   └── unit
+    │       ├── Deployment.spec.ts
+    │       ├── Deposits.spec.ts
+    │       ├── EternalFarms.spec.ts
+    │       ├── FarmingCenter.spec.ts
+    │       ├── FarmingCenterVault.ts
+    │       ├── Farms.spec.ts
+    │       ├── Incentives.spec.ts
+    │       ├── Multicall.spec.ts
+    │       ├── RewardMath
+    │       │   └── RewardMath.spec.ts
+    │       └── __snapshots__
+    │           ├── Deposits.spec.ts.snap
+    │           ├── EternalFarms.spec.ts.snap
+    │           ├── FarmingCenter.spec.ts.snap
+    │           ├── Farms.spec.ts.snap
+    │           └── Incentives.spec.ts.snap
+    ├── tsconfig.json
+    └── types
+        └── contractParams.ts
+lib/cryptoalgebra/Algebra/V1.9/src
+├── core
+│   ├── contracts
+│   │   ├── AlgebraFactory.sol
+│   │   ├── AlgebraPoolDeployer.sol
+│   │   ├── AlgebraPool.sol
+│   │   ├── base
+│   │   │   ├── PoolImmutables.sol
+│   │   │   └── PoolState.sol
+│   │   ├── DataStorageOperator.sol
+│   │   ├── interfaces
+│   │   │   ├── callback
+│   │   │   │   ├── IAlgebraFlashCallback.sol
+│   │   │   │   ├── IAlgebraMintCallback.sol
+│   │   │   │   └── IAlgebraSwapCallback.sol
+│   │   │   ├── IAlgebraFactory.sol
+│   │   │   ├── IAlgebraPoolDeployer.sol
+│   │   │   ├── IAlgebraPool.sol
+│   │   │   ├── IAlgebraVirtualPool.sol
+│   │   │   ├── IDataStorageOperator.sol
+│   │   │   ├── IERC20Minimal.sol
+│   │   │   └── pool
+│   │   │       ├── IAlgebraPoolActions.sol
+│   │   │       ├── IAlgebraPoolDerivedState.sol
+│   │   │       ├── IAlgebraPoolEvents.sol
+│   │   │       ├── IAlgebraPoolImmutables.sol
+│   │   │       ├── IAlgebraPoolPermissionedActions.sol
+│   │   │       └── IAlgebraPoolState.sol
+│   │   ├── libraries
+│   │   │   ├── AdaptiveFee.sol
+│   │   │   ├── Constants.sol
+│   │   │   ├── DataStorage.sol
+│   │   │   ├── FullMath.sol
+│   │   │   ├── LICENSE_GPL
+│   │   │   ├── LICENSE_MIT
+│   │   │   ├── LiquidityMath.sol
+│   │   │   ├── LowGasSafeMath.sol
+│   │   │   ├── PriceMovementMath.sol
+│   │   │   ├── SafeCast.sol
+│   │   │   ├── Sqrt.sol
+│   │   │   ├── TickManager.sol
+│   │   │   ├── TickMath.sol
+│   │   │   ├── TickTable.sol
+│   │   │   ├── TokenDeltaMath.sol
+│   │   │   └── TransferHelper.sol
+│   │   └── test
+│   │       ├── AdaptiveFeeEchidnaTest.sol
+│   │       ├── AdaptiveFeeTest.sol
+│   │       ├── AlgebraPoolSwapTest.sol
+│   │       ├── BitMathEchidnaTest.sol
+│   │       ├── BitMathTest.sol
+│   │       ├── DataStorageEchidnaTest.sol
+│   │       ├── DataStorageTest.sol
+│   │       ├── FullMathEchidnaTest.sol
+│   │       ├── FullMathTest.sol
+│   │       ├── LiquidityAmounts.sol
+│   │       ├── LiquidityMathTest.sol
+│   │       ├── LowGasSafeMathEchidnaTest.sol
+│   │       ├── MockTimeAlgebraPoolDeployer.sol
+│   │       ├── MockTimeAlgebraPool.sol
+│   │       ├── MockTimeVirtualPool.sol
+│   │       ├── PriceMovementMathEchidnaTest.sol
+│   │       ├── PriceMovementMathTest.sol
+│   │       ├── SafeMathTest.sol
+│   │       ├── simulation
+│   │       │   ├── SimulationTimeAlgebraPool.sol
+│   │       │   ├── SimulationTimeFactory.sol
+│   │       │   └── SimulationTimePoolDeployer.sol
+│   │       ├── TestAlgebraCallee.sol
+│   │       ├── TestAlgebraReentrantCallee.sol
+│   │       ├── TestAlgebraRouter.sol
+│   │       ├── TestAlgebraSwapPay.sol
+│   │       ├── TestERC20.sol
+│   │       ├── TickMathEchidnaTest.sol
+│   │       ├── TickMathTest.sol
+│   │       ├── TickOverflowSafetyEchidnaTest.sol
+│   │       ├── TickTableEchidnaTest.sol
+│   │       ├── TickTableTest.sol
+│   │       ├── TickTest.sol
+│   │       ├── TokenDeltaMathEchidnaTest.sol
+│   │       ├── TokenDeltaMathTest.sol
+│   │       └── UnsafeMathEchidnaTest.sol
+│   ├── echidna.config.yml
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── README.md
+│   ├── scripts
+│   │   ├── deploy.js
+│   │   ├── getOracleData.js
+│   │   └── Simulation.ts
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── AdaptiveFee.spec.ts
+│   │   ├── AlgebraFactory.spec.ts
+│   │   ├── AlgebraPool.arbitrage.spec.ts
+│   │   ├── AlgebraPool.gas.spec.ts
+│   │   ├── AlgebraPool.spec.ts
+│   │   ├── AlgebraPool.swaps.spec.ts
+│   │   ├── AlgebraRouter.spec.ts
+│   │   ├── BitMath.spec.ts
+│   │   ├── DataStorage.spec.ts
+│   │   ├── LiquidityMath.spec.ts
+│   │   ├── Math.spec.ts
+│   │   ├── PriceMovement.spec.ts
+│   │   ├── shared
+│   │   │   ├── checkTimepointEquals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── fixtures.ts
+│   │   │   ├── format.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   └── utilities.ts
+│   │   ├── __snapshots__
+│   │   │   ├── AdaptiveFee.spec.ts.snap
+│   │   │   ├── AlgebraFactory.spec.ts.snap
+│   │   │   ├── AlgebraPool.arbitrage.spec.ts.snap
+│   │   │   ├── AlgebraPool.gas.spec.ts.snap
+│   │   │   ├── AlgebraPool.spec.ts.snap
+│   │   │   ├── AlgebraPool.swaps.spec.ts.snap
+│   │   │   ├── BitMath.spec.ts.snap
+│   │   │   ├── DataStorage.spec.ts.snap
+│   │   │   ├── LiquidityMath.spec.ts.snap
+│   │   │   ├── PriceMovement.spec.ts.snap
+│   │   │   ├── TickTable.spec.ts.snap
+│   │   │   └── TokenDeltaMath.spec.ts.snap
+│   │   ├── Tick.spec.ts
+│   │   ├── TickTable.spec.ts
+│   │   └── TokenDeltaMath.spec.ts
+│   └── tsconfig.json
+├── periphery
+│   ├── contracts
+│   │   ├── base
+│   │   │   ├── BlockTimestamp.sol
+│   │   │   ├── ERC721Permit.sol
+│   │   │   ├── LiquidityManagement.sol
+│   │   │   ├── Multicall.sol
+│   │   │   ├── PeripheryImmutableState.sol
+│   │   │   ├── PeripheryPayments.sol
+│   │   │   ├── PeripheryPaymentsWithFee.sol
+│   │   │   ├── PeripheryValidation.sol
+│   │   │   ├── PoolInitializer.sol
+│   │   │   └── SelfPermit.sol
+│   │   ├── interfaces
+│   │   │   ├── external
+│   │   │   │   ├── IERC1271.sol
+│   │   │   │   ├── IERC20PermitAllowed.sol
+│   │   │   │   └── IWNativeToken.sol
+│   │   │   ├── IERC20Metadata.sol
+│   │   │   ├── IERC721Permit.sol
+│   │   │   ├── IMulticall.sol
+│   │   │   ├── INonfungiblePositionManager.sol
+│   │   │   ├── INonfungibleTokenPositionDescriptor.sol
+│   │   │   ├── IPeripheryImmutableState.sol
+│   │   │   ├── IPeripheryPayments.sol
+│   │   │   ├── IPeripheryPaymentsWithFee.sol
+│   │   │   ├── IPoolInitializer.sol
+│   │   │   ├── IQuoter.sol
+│   │   │   ├── IQuoterV2.sol
+│   │   │   ├── ISelfPermit.sol
+│   │   │   ├── ISwapRouter.sol
+│   │   │   ├── ITickLens.sol
+│   │   │   └── IV3Migrator.sol
+│   │   ├── lens
+│   │   │   ├── AlgebraInterfaceMulticall.sol
+│   │   │   ├── Quoter.sol
+│   │   │   ├── QuoterV2.sol
+│   │   │   ├── README.md
+│   │   │   └── TickLens.sol
+│   │   ├── libraries
+│   │   │   ├── AddressStringUtil.sol
+│   │   │   ├── BytesLib.sol
+│   │   │   ├── CallbackValidation.sol
+│   │   │   ├── ChainId.sol
+│   │   │   ├── DataStorageLibrary.sol
+│   │   │   ├── HexStrings.sol
+│   │   │   ├── LiquidityAmounts.sol
+│   │   │   ├── NFTDescriptor.sol
+│   │   │   ├── NFTSVG.sol
+│   │   │   ├── Path.sol
+│   │   │   ├── PoolAddress.sol
+│   │   │   ├── PoolTicksCounter.sol
+│   │   │   ├── PositionKey.sol
+│   │   │   ├── SafeERC20Namer.sol
+│   │   │   ├── TokenRatioSortOrder.sol
+│   │   │   ├── TransferHelper.sol
+│   │   │   └── WeightedDataStorageLibrary.sol
+│   │   ├── NonfungiblePositionManager.sol
+│   │   ├── NonfungibleTokenPositionDescriptor.sol
+│   │   ├── SwapRouter.sol
+│   │   ├── test
+│   │   │   ├── Base64Test.sol
+│   │   │   ├── LiquidityAmountsTest.sol
+│   │   │   ├── MockObservable.sol
+│   │   │   ├── MockTimeNonfungiblePositionManager.sol
+│   │   │   ├── MockTimeSwapRouter.sol
+│   │   │   ├── NFTDescriptorTest.sol
+│   │   │   ├── NonfungiblePositionManagerPositionsGasTest.sol
+│   │   │   ├── OracleTest.sol
+│   │   │   ├── PathTest.sol
+│   │   │   ├── PeripheryImmutableStateTest.sol
+│   │   │   ├── PoolAddressTest.sol
+│   │   │   ├── PoolTicksCounterTest.sol
+│   │   │   ├── SelfPermitTest.sol
+│   │   │   ├── TestAlgebraCallee.sol
+│   │   │   ├── TestCallbackValidation.sol
+│   │   │   ├── TestERC20Metadata.sol
+│   │   │   ├── TestERC20PermitAllowed.sol
+│   │   │   ├── TestERC20.sol
+│   │   │   ├── TestMulticall.sol
+│   │   │   ├── TestPositionNFTOwner.sol
+│   │   │   ├── TickLensTest.sol
+│   │   │   └── WeightedOracleTest.sol
+│   │   └── V3Migrator.sol
+│   ├── coverage.json
+│   ├── hardhat.config.ts
+│   ├── LICENSE
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── scripts
+│   │   └── deploy.js
+│   ├── slither.config.json
+│   ├── test
+│   │   ├── Base64.spec.ts
+│   │   ├── CallbackValidation.spec.ts
+│   │   ├── contracts
+│   │   │   └── WNativeToken.json
+│   │   ├── LiquidityAmounts.spec.ts
+│   │   ├── Multicall.spec.ts
+│   │   ├── NFTDescriptor.spec.ts
+│   │   ├── NonfungiblePositionManager.spec.ts
+│   │   ├── NonfungibleTokenPositionDescriptor.spec.ts
+│   │   ├── OracleLibrary.spec.ts
+│   │   ├── Path.spec.ts
+│   │   ├── PeripheryImmutableState.spec.ts
+│   │   ├── PoolAddress.spec.ts
+│   │   ├── PoolTicksCounter.spec.ts
+│   │   ├── Quoter.spec.ts
+│   │   ├── QuoterV2.spec.ts
+│   │   ├── SelfPermit.spec.ts
+│   │   ├── shared
+│   │   │   ├── base64.ts
+│   │   │   ├── completeFixture.ts
+│   │   │   ├── computePoolAddress.ts
+│   │   │   ├── constants.ts
+│   │   │   ├── encodePriceSqrt.ts
+│   │   │   ├── expandTo18Decimals.ts
+│   │   │   ├── expect.ts
+│   │   │   ├── externalFixtures.ts
+│   │   │   ├── extractJSONFromURI.ts
+│   │   │   ├── formatSqrtRatioX96.spec.ts
+│   │   │   ├── formatSqrtRatioX96.ts
+│   │   │   ├── getPermitNFTSignature.ts
+│   │   │   ├── path.ts
+│   │   │   ├── permit.ts
+│   │   │   ├── poolAtAddress.ts
+│   │   │   ├── quoter.ts
+│   │   │   ├── snapshotGasCost.ts
+│   │   │   ├── ticks.ts
+│   │   │   └── tokenSort.ts
+│   │   ├── __snapshots__
+│   │   │   ├── Base64.spec.ts.snap
+│   │   │   ├── LiquidityAmounts.spec.ts.snap
+│   │   │   ├── Multicall.spec.ts.snap
+│   │   │   ├── NFTDescriptor.spec.ts.snap
+│   │   │   ├── NFTDescriptor.svg
+│   │   │   ├── NonfungiblePositionManager.spec.ts.snap
+│   │   │   ├── OracleLibrary.spec.ts.snap
+│   │   │   ├── Path.spec.ts.snap
+│   │   │   ├── PeripheryImmutableState.spec.ts.snap
+│   │   │   ├── PoolAddress.spec.ts.snap
+│   │   │   ├── QuoterV2.spec.ts.snap
+│   │   │   ├── SwapRouter.spec.ts.snap
+│   │   │   ├── TickLens.spec.ts.snap
+│   │   │   └── V3Migrator.spec.ts.snap
+│   │   ├── SwapRouter.spec.ts
+│   │   ├── TickLens.spec.ts
+│   │   ├── V3Migrator.spec.ts
+│   │   └── WeightedOracleLibrary.spec.ts
+│   └── tsconfig.json
+└── tokenomics
+    ├── contracts
+    │   ├── AlgebraTokenStaking.sol
+    │   ├── AlgebraVault.sol
+    │   ├── base
+    │   │   ├── ERC20.sol
+    │   │   ├── FreezableToken.sol
+    │   │   └── PeripheryPayments.sol
+    │   ├── FarmingCenter.sol
+    │   ├── FarmingCenterVault.sol
+    │   ├── farmings
+    │   │   ├── AlgebraFarming.sol
+    │   │   ├── AlgebraVirtualPoolBase.sol
+    │   │   ├── eternalFarming
+    │   │   │   ├── AlgebraEternalFarming.sol
+    │   │   │   ├── EternalVirtualPool.sol
+    │   │   │   └── interfaces
+    │   │   │       ├── IAlgebraEternalFarming.sol
+    │   │   │       └── IAlgebraEternalVirtualPool.sol
+    │   │   ├── IAlgebraVirtualPoolBase.sol
+    │   │   └── limitFarming
+    │   │       ├── AlgebraLimitFarming.sol
+    │   │       ├── interfaces
+    │   │       │   ├── IAlgebraLimitFarming.sol
+    │   │       │   └── IAlgebraLimitVirtualPool.sol
+    │   │       └── LimitVirtualPool.sol
+    │   ├── interfaces
+    │   │   ├── IAlgebraFarming.sol
+    │   │   ├── IERC20Freezable.sol
+    │   │   ├── IFarmingCenter.sol
+    │   │   ├── IFarmingCenterVault.sol
+    │   │   └── IIncentiveKey.sol
+    │   ├── libraries
+    │   │   ├── IncentiveId.sol
+    │   │   ├── LiquidityTier.sol
+    │   │   ├── NFTPositionInfo.sol
+    │   │   └── RewardMath.sol
+    │   ├── LICENSE
+    │   └── test
+    │       ├── TestERC20.sol
+    │       ├── TestIncentiveId.sol
+    │       └── TestRewardMath.sol
+    ├── hardhat.config.ts
+    ├── LICENSE
+    ├── package.json
+    ├── package-lock.json
+    ├── README.md
+    ├── scripts
+    │   ├── deploy.js
+    │   ├── deployStaking.js
+    │   └── deployVault.js
+    ├── slither.config.json
+    ├── test
+    │   ├── AlgebraFarming.spec.ts
+    │   ├── AlgebraTokenStaking.spec.ts
+    │   ├── AlgebraVault.spec.ts
+    │   ├── helpers
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── matchers
+    │   │   └── beWithin.ts
+    │   ├── shared
+    │   │   ├── actors.ts
+    │   │   ├── completeFixture.ts
+    │   │   ├── external
+    │   │   │   ├── v3-periphery
+    │   │   │   │   ├── constants.ts
+    │   │   │   │   ├── ticks.ts
+    │   │   │   │   └── tokenSort.ts
+    │   │   │   └── WNativeToken.json
+    │   │   ├── externalFixtures.ts
+    │   │   ├── fixtures.ts
+    │   │   ├── index.ts
+    │   │   ├── linkLibraries.ts
+    │   │   ├── logging.ts
+    │   │   ├── provider.ts
+    │   │   ├── ticks.ts
+    │   │   └── time.ts
+    │   ├── types.ts
+    │   └── unit
+    │       ├── Deployment.spec.ts
+    │       ├── Deposits.spec.ts
+    │       ├── EternalFarms.spec.ts
+    │       ├── FarmingCenter.spec.ts
+    │       ├── FarmingCenterVault.ts
+    │       ├── Farms.spec.ts
+    │       ├── Incentives.spec.ts
+    │       ├── Multicall.spec.ts
+    │       ├── RewardMath
+    │       │   └── RewardMath.spec.ts
+    │       └── __snapshots__
+    │           ├── Deposits.spec.ts.snap
+    │           ├── EternalFarms.spec.ts.snap
+    │           ├── FarmingCenter.spec.ts.snap
+    │           ├── Farms.spec.ts.snap
+    │           └── Incentives.spec.ts.snap
+    ├── tsconfig.json
+    └── types
+        └── contractParams.ts
+lib/uniswap/src/pkgs/permit2/src
+├── AllowanceTransfer.sol
+├── EIP712.sol
+├── interfaces
+│   ├── IAllowanceTransfer.sol
+│   ├── IDAIPermit.sol
+│   ├── IEIP712.sol
+│   ├── IERC1271.sol
+│   ├── IPermit2.sol
+│   └── ISignatureTransfer.sol
+├── libraries
+│   ├── Allowance.sol
+│   ├── Permit2Lib.sol
+│   ├── PermitHash.sol
+│   ├── SafeCast160.sol
+│   └── SignatureVerification.sol
+├── Permit2.sol
+├── PermitErrors.sol
+└── SignatureTransfer.sol
+lib/uniswap/src/pkgs/uniswapx/src
+├── base
+│   ├── BlockNumberish.sol
+│   ├── ProtocolFees.sol
+│   ├── ReactorEvents.sol
+│   └── ReactorStructs.sol
+├── external
+│   ├── ISwapRouter02.sol
+│   └── IUniversalRouter.sol
+├── interfaces
+│   ├── IArbSys.sol
+│   ├── IProtocolFeeController.sol
+│   ├── IReactorCallback.sol
+│   ├── IReactor.sol
+│   └── IValidationCallback.sol
+├── lens
+│   └── OrderQuoter.sol
+├── lib
+│   ├── CosignerLib.sol
+│   ├── CurrencyLibrary.sol
+│   ├── DutchDecayLib.sol
+│   ├── DutchOrderLib.sol
+│   ├── ExclusiveDutchOrderLib.sol
+│   ├── ExclusivityLib.sol
+│   ├── LimitOrderLib.sol
+│   ├── MathExt.sol
+│   ├── NonlinearDutchDecayLib.sol
+│   ├── OrderInfoLib.sol
+│   ├── Permit2Lib.sol
+│   ├── PriorityFeeLib.sol
+│   ├── PriorityOrderLib.sol
+│   ├── ResolvedOrderLib.sol
+│   ├── V2DutchOrderLib.sol
+│   └── V3DutchOrderLib.sol
+├── reactors
+│   ├── BaseReactor.sol
+│   ├── DutchOrderReactor.sol
+│   ├── ExclusiveDutchOrderReactor.sol
+│   ├── LimitOrderReactor.sol
+│   ├── PriorityOrderReactor.sol
+│   ├── V2DutchOrderReactor.sol
+│   └── V3DutchOrderReactor.sol
+├── sample-executors
+│   ├── MultiFillerSwapRouter02Executor.sol
+│   ├── SwapRouter02Executor.sol
+│   └── UniversalRouterExecutor.sol
+├── sample-validation-contracts
+│   └── ExclusiveFillerValidation.sol
+└── types
+    └── Uint16Array.sol
+lib/uniswap/src/pkgs/util-contracts/src
+├── ERC7914Detector.sol
+├── external
+│   ├── IAllowanceTransfer.sol
+│   ├── IEIP712.sol
+│   └── IPermit2.sol
+├── FeeCollector.sol
+├── FeeOnTransferDetector.sol
+├── interfaces
+│   ├── ICalibur.sol
+│   ├── IERC7914.sol
+│   └── IFeeCollector.sol
+└── lib
+    └── UniswapV2Library.sol
+lib/uniswap/src/pkgs/v4-core/src
+├── ERC6909Claims.sol
+├── ERC6909.sol
+├── Extsload.sol
+├── Exttload.sol
+├── interfaces
+│   ├── callback
+│   │   └── IUnlockCallback.sol
+│   ├── external
+│   │   ├── IERC20Minimal.sol
+│   │   └── IERC6909Claims.sol
+│   ├── IExtsload.sol
+│   ├── IExttload.sol
+│   ├── IHooks.sol
+│   ├── IPoolManager.sol
+│   └── IProtocolFees.sol
+├── libraries
+│   ├── BitMath.sol
+│   ├── CurrencyDelta.sol
+│   ├── CurrencyReserves.sol
+│   ├── CustomRevert.sol
+│   ├── FixedPoint128.sol
+│   ├── FixedPoint96.sol
+│   ├── FullMath.sol
+│   ├── Hooks.sol
+│   ├── LiquidityMath.sol
+│   ├── Lock.sol
+│   ├── LPFeeLibrary.sol
+│   ├── NonzeroDeltaCount.sol
+│   ├── ParseBytes.sol
+│   ├── Pool.sol
+│   ├── Position.sol
+│   ├── ProtocolFeeLibrary.sol
+│   ├── SafeCast.sol
+│   ├── SqrtPriceMath.sol
+│   ├── StateLibrary.sol
+│   ├── SwapMath.sol
+│   ├── TickBitmap.sol
+│   ├── TickMath.sol
+│   ├── TransientStateLibrary.sol
+│   └── UnsafeMath.sol
+├── NoDelegateCall.sol
+├── PoolManager.sol
+├── ProtocolFees.sol
+├── test
+│   ├── ActionsRouter.sol
+│   ├── BaseTestHooks.sol
+│   ├── CurrencyTest.sol
+│   ├── CustomCurveHook.sol
+│   ├── DeltaReturningHook.sol
+│   ├── DynamicFeesTestHook.sol
+│   ├── DynamicReturnFeeTestHook.sol
+│   ├── EmptyRevertContract.sol
+│   ├── EmptyTestHooks.sol
+│   ├── FeeTakingHook.sol
+│   ├── Fuzzers.sol
+│   ├── HooksTest.sol
+│   ├── LiquidityMathTest.sol
+│   ├── LPFeeTakingHook.sol
+│   ├── MockContract.sol
+│   ├── MockERC6909Claims.sol
+│   ├── MockHooks.sol
+│   ├── NativeERC20.sol
+│   ├── NoDelegateCallTest.sol
+│   ├── PoolClaimsTest.sol
+│   ├── PoolDonateTest.sol
+│   ├── PoolEmptyUnlockTest.sol
+│   ├── PoolModifyLiquidityTestNoChecks.sol
+│   ├── PoolModifyLiquidityTest.sol
+│   ├── PoolNestedActionsTest.sol
+│   ├── PoolSwapTest.sol
+│   ├── PoolTakeTest.sol
+│   ├── PoolTestBase.sol
+│   ├── ProtocolFeesImplementation.sol
+│   ├── ProxyPoolManager.sol
+│   ├── SkipCallsTestHook.sol
+│   ├── SqrtPriceMathEchidnaTest.sol
+│   ├── SwapRouterNoChecks.sol
+│   ├── TestERC20.sol
+│   ├── TestInvalidERC20.sol
+│   ├── TickMathEchidnaTest.sol
+│   ├── TickMathTest.sol
+│   └── TickOverflowSafetyEchidnaTest.sol
+└── types
+    ├── BalanceDelta.sol
+    ├── BeforeSwapDelta.sol
+    ├── Currency.sol
+    ├── PoolId.sol
+    ├── PoolKey.sol
+    ├── PoolOperation.sol
+    └── Slot0.sol
+lib/uniswap/src/pkgs/v4-periphery/src
+├── base
+│   ├── BaseActionsRouter.sol
+│   ├── BaseV4Quoter.sol
+│   ├── DeltaResolver.sol
+│   ├── EIP712_v4.sol
+│   ├── ERC721Permit_v4.sol
+│   ├── hooks
+│   │   └── BaseTokenWrapperHook.sol
+│   ├── ImmutableState.sol
+│   ├── Multicall_v4.sol
+│   ├── NativeWrapper.sol
+│   ├── Notifier.sol
+│   ├── Permit2Forwarder.sol
+│   ├── PoolInitializer_v4.sol
+│   ├── ReentrancyLock.sol
+│   ├── SafeCallback.sol
+│   └── UnorderedNonce.sol
+├── hooks
+│   ├── WETHHook.sol
+│   └── WstETHHook.sol
+├── interfaces
+│   ├── external
+│   │   ├── IWETH9.sol
+│   │   └── IWstETH.sol
+│   ├── IEIP712_v4.sol
+│   ├── IERC721Permit_v4.sol
+│   ├── IImmutableState.sol
+│   ├── IMsgSender.sol
+│   ├── IMulticall_v4.sol
+│   ├── INotifier.sol
+│   ├── IPermit2Forwarder.sol
+│   ├── IPoolInitializer_v4.sol
+│   ├── IPositionDescriptor.sol
+│   ├── IPositionManager.sol
+│   ├── IStateView.sol
+│   ├── ISubscriber.sol
+│   ├── IUniswapV4DeployerCompetition.sol
+│   ├── IUnorderedNonce.sol
+│   ├── IV4Quoter.sol
+│   └── IV4Router.sol
+├── lens
+│   ├── StateView.sol
+│   └── V4Quoter.sol
+├── libraries
+│   ├── ActionConstants.sol
+│   ├── Actions.sol
+│   ├── AddressStringUtil.sol
+│   ├── BipsLibrary.sol
+│   ├── CalldataDecoder.sol
+│   ├── CurrencyRatioSortOrder.sol
+│   ├── Descriptor.sol
+│   ├── ERC721PermitHash.sol
+│   ├── HexStrings.sol
+│   ├── LiquidityAmounts.sol
+│   ├── Locker.sol
+│   ├── PathKey.sol
+│   ├── PositionConfigId.sol
+│   ├── PositionConfig.sol
+│   ├── PositionInfoLibrary.sol
+│   ├── QuoterRevert.sol
+│   ├── SafeCurrencyMetadata.sol
+│   ├── SlippageCheck.sol
+│   ├── SVG.sol
+│   └── VanityAddressLib.sol
+├── PositionDescriptor.sol
+├── PositionManager.sol
+├── UniswapV4DeployerCompetition.sol
+├── utils
+│   ├── BaseHook.sol
+│   └── HookMiner.sol
+└── V4Router.sol
+lib/OpenZeppelin/openzeppelin-contracts/contracts/
+├── access
+│   ├── AccessControl.sol
+│   ├── extensions
+│   │   ├── AccessControlDefaultAdminRules.sol
+│   │   ├── AccessControlEnumerable.sol
+│   │   ├── IAccessControlDefaultAdminRules.sol
+│   │   └── IAccessControlEnumerable.sol
+│   ├── IAccessControl.sol
+│   ├── manager
+│   │   ├── AccessManaged.sol
+│   │   ├── AccessManager.sol
+│   │   ├── AuthorityUtils.sol
+│   │   ├── IAccessManaged.sol
+│   │   ├── IAccessManager.sol
+│   │   └── IAuthority.sol
+│   ├── Ownable2Step.sol
+│   ├── Ownable.sol
+│   └── README.adoc
+├── account
+│   ├── Account.sol
+│   ├── extensions
+│   │   ├── draft-AccountERC7579Hooked.sol
+│   │   ├── draft-AccountERC7579.sol
+│   │   └── draft-ERC7821.sol
+│   ├── README.adoc
+│   └── utils
+│       ├── draft-ERC4337Utils.sol
+│       ├── draft-ERC7579Utils.sol
+│       └── EIP7702Utils.sol
+├── finance
+│   ├── README.adoc
+│   ├── VestingWalletCliff.sol
+│   └── VestingWallet.sol
+├── governance
+│   ├── extensions
+│   │   ├── GovernorCountingFractional.sol
+│   │   ├── GovernorCountingOverridable.sol
+│   │   ├── GovernorCountingSimple.sol
+│   │   ├── GovernorNoncesKeyed.sol
+│   │   ├── GovernorPreventLateQuorum.sol
+│   │   ├── GovernorProposalGuardian.sol
+│   │   ├── GovernorSequentialProposalId.sol
+│   │   ├── GovernorSettings.sol
+│   │   ├── GovernorStorage.sol
+│   │   ├── GovernorSuperQuorum.sol
+│   │   ├── GovernorTimelockAccess.sol
+│   │   ├── GovernorTimelockCompound.sol
+│   │   ├── GovernorTimelockControl.sol
+│   │   ├── GovernorVotesQuorumFraction.sol
+│   │   ├── GovernorVotes.sol
+│   │   └── GovernorVotesSuperQuorumFraction.sol
+│   ├── Governor.sol
+│   ├── IGovernor.sol
+│   ├── README.adoc
+│   ├── TimelockController.sol
+│   └── utils
+│       ├── IVotes.sol
+│       ├── VotesExtended.sol
+│       └── Votes.sol
+├── interfaces
+│   ├── draft-IERC1822.sol
+│   ├── draft-IERC4337.sol
+│   ├── draft-IERC6093.sol
+│   ├── draft-IERC6909.sol
+│   ├── draft-IERC7579.sol
+│   ├── draft-IERC7674.sol
+│   ├── draft-IERC7802.sol
+│   ├── draft-IERC7821.sol
+│   ├── IERC1155MetadataURI.sol
+│   ├── IERC1155Receiver.sol
+│   ├── IERC1155.sol
+│   ├── IERC1271.sol
+│   ├── IERC1363Receiver.sol
+│   ├── IERC1363.sol
+│   ├── IERC1363Spender.sol
+│   ├── IERC165.sol
+│   ├── IERC1820Implementer.sol
+│   ├── IERC1820Registry.sol
+│   ├── IERC1967.sol
+│   ├── IERC20Metadata.sol
+│   ├── IERC20.sol
+│   ├── IERC2309.sol
+│   ├── IERC2612.sol
+│   ├── IERC2981.sol
+│   ├── IERC3156FlashBorrower.sol
+│   ├── IERC3156FlashLender.sol
+│   ├── IERC3156.sol
+│   ├── IERC4626.sol
+│   ├── IERC4906.sol
+│   ├── IERC5267.sol
+│   ├── IERC5313.sol
+│   ├── IERC5805.sol
+│   ├── IERC6372.sol
+│   ├── IERC721Enumerable.sol
+│   ├── IERC721Metadata.sol
+│   ├── IERC721Receiver.sol
+│   ├── IERC721.sol
+│   ├── IERC777Recipient.sol
+│   ├── IERC777Sender.sol
+│   ├── IERC777.sol
+│   ├── IERC7913.sol
+│   └── README.adoc
+├── metatx
+│   ├── ERC2771Context.sol
+│   ├── ERC2771Forwarder.sol
+│   └── README.adoc
+├── mocks
+│   ├── AccessManagedTarget.sol
+│   ├── AccessManagerMock.sol
+│   ├── account
+│   │   ├── AccountMock.sol
+│   │   ├── modules
+│   │   │   └── ERC7579Mock.sol
+│   │   └── utils
+│   │       └── ERC7579UtilsMock.sol
+│   ├── ArraysMock.sol
+│   ├── AuthorityMock.sol
+│   ├── Base64Dirty.sol
+│   ├── BatchCaller.sol
+│   ├── CallReceiverMock.sol
+│   ├── compound
+│   │   └── CompTimelock.sol
+│   ├── ConstructorMock.sol
+│   ├── ContextMock.sol
+│   ├── docs
+│   │   ├── access-control
+│   │   │   ├── AccessControlERC20MintBase.sol
+│   │   │   ├── AccessControlERC20MintMissing.sol
+│   │   │   ├── AccessControlERC20MintOnlyRole.sol
+│   │   │   ├── AccessControlModified.sol
+│   │   │   ├── AccessManagedERC20MintBase.sol
+│   │   │   └── MyContractOwnable.sol
+│   │   ├── ERC20WithAutoMinerReward.sol
+│   │   ├── ERC4626Fees.sol
+│   │   ├── governance
+│   │   │   ├── MyGovernor.sol
+│   │   │   ├── MyToken.sol
+│   │   │   ├── MyTokenTimestampBased.sol
+│   │   │   └── MyTokenWrapped.sol
+│   │   ├── MyNFT.sol
+│   │   ├── token
+│   │   │   ├── ERC1155
+│   │   │   │   ├── GameItems.sol
+│   │   │   │   └── MyERC115HolderContract.sol
+│   │   │   ├── ERC20
+│   │   │   │   └── GLDToken.sol
+│   │   │   ├── ERC6909
+│   │   │   │   └── ERC6909GameItems.sol
+│   │   │   └── ERC721
+│   │   │       └── GameItem.sol
+│   │   └── utilities
+│   │       ├── Base64NFT.sol
+│   │       └── Multicall.sol
+│   ├── DummyImplementation.sol
+│   ├── EIP712Verifier.sol
+│   ├── ERC1271WalletMock.sol
+│   ├── ERC165
+│   │   ├── ERC165InterfacesSupported.sol
+│   │   ├── ERC165MaliciousData.sol
+│   │   ├── ERC165MissingData.sol
+│   │   ├── ERC165NotSupported.sol
+│   │   └── ERC165ReturnBomb.sol
+│   ├── ERC2771ContextMock.sol
+│   ├── ERC3156FlashBorrowerMock.sol
+│   ├── EtherReceiverMock.sol
+│   ├── governance
+│   │   ├── GovernorCountingOverridableMock.sol
+│   │   ├── GovernorFractionalMock.sol
+│   │   ├── GovernorMock.sol
+│   │   ├── GovernorNoncesKeyedMock.sol
+│   │   ├── GovernorPreventLateQuorumMock.sol
+│   │   ├── GovernorProposalGuardianMock.sol
+│   │   ├── GovernorSequentialProposalIdMock.sol
+│   │   ├── GovernorStorageMock.sol
+│   │   ├── GovernorSuperQuorumMock.sol
+│   │   ├── GovernorTimelockAccessMock.sol
+│   │   ├── GovernorTimelockCompoundMock.sol
+│   │   ├── GovernorTimelockControlMock.sol
+│   │   ├── GovernorVoteMock.sol
+│   │   ├── GovernorVotesSuperQuorumFractionMock.sol
+│   │   └── GovernorWithParamsMock.sol
+│   ├── InitializableMock.sol
+│   ├── MerkleProofCustomHashMock.sol
+│   ├── MerkleTreeMock.sol
+│   ├── MulticallHelper.sol
+│   ├── MultipleInheritanceInitializableMocks.sol
+│   ├── PausableMock.sol
+│   ├── proxy
+│   │   ├── BadBeacon.sol
+│   │   ├── ClashingImplementation.sol
+│   │   └── UUPSUpgradeableMock.sol
+│   ├── ReentrancyAttack.sol
+│   ├── ReentrancyMock.sol
+│   ├── ReentrancyTransientMock.sol
+│   ├── RegressionImplementation.sol
+│   ├── SingleInheritanceInitializableMocks.sol
+│   ├── Stateless.sol
+│   ├── StorageSlotMock.sol
+│   ├── TimelockReentrant.sol
+│   ├── token
+│   │   ├── ERC1155ReceiverMock.sol
+│   │   ├── ERC1363ForceApproveMock.sol
+│   │   ├── ERC1363NoReturnMock.sol
+│   │   ├── ERC1363ReceiverMock.sol
+│   │   ├── ERC1363ReturnFalseMock.sol
+│   │   ├── ERC1363SpenderMock.sol
+│   │   ├── ERC20ApprovalMock.sol
+│   │   ├── ERC20BridgeableMock.sol
+│   │   ├── ERC20DecimalsMock.sol
+│   │   ├── ERC20ExcessDecimalsMock.sol
+│   │   ├── ERC20FlashMintMock.sol
+│   │   ├── ERC20ForceApproveMock.sol
+│   │   ├── ERC20GetterHelper.sol
+│   │   ├── ERC20Mock.sol
+│   │   ├── ERC20MulticallMock.sol
+│   │   ├── ERC20NoReturnMock.sol
+│   │   ├── ERC20Reentrant.sol
+│   │   ├── ERC20ReturnFalseMock.sol
+│   │   ├── ERC20VotesAdditionalCheckpointsMock.sol
+│   │   ├── ERC20VotesLegacyMock.sol
+│   │   ├── ERC20VotesTimestampMock.sol
+│   │   ├── ERC4626LimitsMock.sol
+│   │   ├── ERC4626Mock.sol
+│   │   ├── ERC4626OffsetMock.sol
+│   │   ├── ERC4646FeesMock.sol
+│   │   ├── ERC721ConsecutiveEnumerableMock.sol
+│   │   ├── ERC721ConsecutiveMock.sol
+│   │   ├── ERC721ReceiverMock.sol
+│   │   └── ERC721URIStorageMock.sol
+│   ├── TransientSlotMock.sol
+│   ├── UpgradeableBeaconMock.sol
+│   ├── utils
+│   │   └── cryptography
+│   │       └── ERC7739Mock.sol
+│   ├── VotesExtendedMock.sol
+│   └── VotesMock.sol
+├── package.json
+├── proxy
+│   ├── beacon
+│   │   ├── BeaconProxy.sol
+│   │   ├── IBeacon.sol
+│   │   └── UpgradeableBeacon.sol
+│   ├── Clones.sol
+│   ├── ERC1967
+│   │   ├── ERC1967Proxy.sol
+│   │   └── ERC1967Utils.sol
+│   ├── Proxy.sol
+│   ├── README.adoc
+│   ├── transparent
+│   │   ├── ProxyAdmin.sol
+│   │   └── TransparentUpgradeableProxy.sol
+│   └── utils
+│       ├── Initializable.sol
+│       └── UUPSUpgradeable.sol
+├── token
+│   ├── common
+│   │   ├── ERC2981.sol
+│   │   └── README.adoc
+│   ├── ERC1155
+│   │   ├── ERC1155.sol
+│   │   ├── extensions
+│   │   │   ├── ERC1155Burnable.sol
+│   │   │   ├── ERC1155Pausable.sol
+│   │   │   ├── ERC1155Supply.sol
+│   │   │   ├── ERC1155URIStorage.sol
+│   │   │   └── IERC1155MetadataURI.sol
+│   │   ├── IERC1155Receiver.sol
+│   │   ├── IERC1155.sol
+│   │   ├── README.adoc
+│   │   └── utils
+│   │       ├── ERC1155Holder.sol
+│   │       └── ERC1155Utils.sol
+│   ├── ERC20
+│   │   ├── ERC20.sol
+│   │   ├── extensions
+│   │   │   ├── draft-ERC20Bridgeable.sol
+│   │   │   ├── draft-ERC20TemporaryApproval.sol
+│   │   │   ├── ERC1363.sol
+│   │   │   ├── ERC20Burnable.sol
+│   │   │   ├── ERC20Capped.sol
+│   │   │   ├── ERC20FlashMint.sol
+│   │   │   ├── ERC20Pausable.sol
+│   │   │   ├── ERC20Permit.sol
+│   │   │   ├── ERC20Votes.sol
+│   │   │   ├── ERC20Wrapper.sol
+│   │   │   ├── ERC4626.sol
+│   │   │   ├── IERC20Metadata.sol
+│   │   │   └── IERC20Permit.sol
+│   │   ├── IERC20.sol
+│   │   ├── README.adoc
+│   │   └── utils
+│   │       ├── ERC1363Utils.sol
+│   │       └── SafeERC20.sol
+│   ├── ERC6909
+│   │   ├── draft-ERC6909.sol
+│   │   ├── extensions
+│   │   │   ├── draft-ERC6909ContentURI.sol
+│   │   │   ├── draft-ERC6909Metadata.sol
+│   │   │   └── draft-ERC6909TokenSupply.sol
+│   │   └── README.adoc
+│   └── ERC721
+│       ├── ERC721.sol
+│       ├── extensions
+│       │   ├── ERC721Burnable.sol
+│       │   ├── ERC721Consecutive.sol
+│       │   ├── ERC721Enumerable.sol
+│       │   ├── ERC721Pausable.sol
+│       │   ├── ERC721Royalty.sol
+│       │   ├── ERC721URIStorage.sol
+│       │   ├── ERC721Votes.sol
+│       │   ├── ERC721Wrapper.sol
+│       │   ├── IERC721Enumerable.sol
+│       │   └── IERC721Metadata.sol
+│       ├── IERC721Receiver.sol
+│       ├── IERC721.sol
+│       ├── README.adoc
+│       └── utils
+│           ├── ERC721Holder.sol
+│           └── ERC721Utils.sol
+├── utils
+│   ├── Address.sol
+│   ├── Arrays.sol
+│   ├── Base64.sol
+│   ├── Blockhash.sol
+│   ├── Bytes.sol
+│   ├── CAIP10.sol
+│   ├── CAIP2.sol
+│   ├── Calldata.sol
+│   ├── Comparators.sol
+│   ├── Context.sol
+│   ├── Create2.sol
+│   ├── cryptography
+│   │   ├── draft-ERC7739Utils.sol
+│   │   ├── ECDSA.sol
+│   │   ├── EIP712.sol
+│   │   ├── Hashes.sol
+│   │   ├── MerkleProof.sol
+│   │   ├── MessageHashUtils.sol
+│   │   ├── P256.sol
+│   │   ├── README.adoc
+│   │   ├── RSA.sol
+│   │   ├── SignatureChecker.sol
+│   │   ├── signers
+│   │   │   ├── AbstractSigner.sol
+│   │   │   ├── draft-ERC7739.sol
+│   │   │   ├── MultiSignerERC7913.sol
+│   │   │   ├── MultiSignerERC7913Weighted.sol
+│   │   │   ├── SignerECDSA.sol
+│   │   │   ├── SignerERC7702.sol
+│   │   │   ├── SignerERC7913.sol
+│   │   │   ├── SignerP256.sol
+│   │   │   └── SignerRSA.sol
+│   │   └── verifiers
+│   │       ├── ERC7913P256Verifier.sol
+│   │       └── ERC7913RSAVerifier.sol
+│   ├── draft-InteroperableAddress.sol
+│   ├── Errors.sol
+│   ├── introspection
+│   │   ├── ERC165Checker.sol
+│   │   ├── ERC165.sol
+│   │   └── IERC165.sol
+│   ├── math
+│   │   ├── Math.sol
+│   │   ├── SafeCast.sol
+│   │   └── SignedMath.sol
+│   ├── Multicall.sol
+│   ├── NoncesKeyed.sol
+│   ├── Nonces.sol
+│   ├── Packing.sol
+│   ├── Panic.sol
+│   ├── Pausable.sol
+│   ├── README.adoc
+│   ├── ReentrancyGuard.sol
+│   ├── ReentrancyGuardTransient.sol
+│   ├── ShortStrings.sol
+│   ├── SlotDerivation.sol
+│   ├── StorageSlot.sol
+│   ├── Strings.sol
+│   ├── structs
+│   │   ├── BitMaps.sol
+│   │   ├── Checkpoints.sol
+│   │   ├── CircularBuffer.sol
+│   │   ├── DoubleEndedQueue.sol
+│   │   ├── EnumerableMap.sol
+│   │   ├── EnumerableSet.sol
+│   │   ├── Heap.sol
+│   │   └── MerkleTree.sol
+│   ├── TransientSlot.sol
+│   └── types
+│       └── Time.sol
+└── vendor
+    └── compound
+        ├── ICompoundTimelock.sol
+        └── LICENSE
+
+290 directories, 1867 files
