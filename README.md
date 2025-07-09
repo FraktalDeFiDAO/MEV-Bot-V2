@@ -121,4 +121,3 @@ go run cmd/main.go
 ### Continuous Integration
 
 This repository uses [GitHub Actions](https://github.com/features/actions) to run the database unit tests on every push and pull request. The workflow lives in `.github/workflows/go.yml` and executes `go test ./Database -run TestDBWriterCommitBatch`.
-
