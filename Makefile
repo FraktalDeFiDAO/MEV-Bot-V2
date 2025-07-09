@@ -1,3 +1,6 @@
+include .env
+export
+
 build-bot:
 	@echo "Building bot"
 	@docker compose run --rm --remove-orphans mev-bot-v2-dev \
