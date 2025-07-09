@@ -1,0 +1,565 @@
+//******************************\\
+// [ START => src/facets/Arbitrage/ArbitrageFacet.sol ]
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "lib/OpenZeppelin/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+import "lib/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "lib/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+
+import "../../libraries/LibAppStorage.sol";
+import "../AccessControl/LibAccessControl.sol";
+import {DEFAULT_ADMIN_ROLE} from "../AccessControl/IAccessControl.sol";
+import "../ExchangeHelper/LibExchangeActions.sol";
+import "../TokenHelper/LibTokenHelper.sol";
+
+// Interface for the flash loan receiver
+interface IFlashLoanReceiver {
+    function executeOperation(
+        address[] calldata assets,
+        uint256[] calldata amounts,
+        uint256[] calldata premiums,
+        address initiator,
+        bytes calldata params
+    ) external returns (bool);
+}
+
+struct ArbitrageCallbackData {
+    address loanAsset;
+    uint256 loanAmount;
+    ActionSwapParams legA;
+    ActionSwapParams legB;
+    uint256 minNetProfitLoanAsset;
+    address initiator;
+}
+
+    event ArbitrageExecuted(
+        address indexed loanAsset,
+        uint256 loanAmount,
+        address tokenIntermediate,
+        uint256 amountIntermediateReceived,
+        uint256 amountLoanAssetRecovered,
+        uint256 profit,
+        address indexed initiator
+    );
+
+    event ProfitWithdrawn(address indexed token, address indexed to, uint256 amount);
+    event ArbitrageRolesInitialized(address indexed initialAdmin);
+
+
+contract ArbitrageFacet is IFlashLoanReceiver, ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
+
+    modifier onlyArbitrageAdmin() {
+        LibAccessControl.enforceRoleOrAdmin(ARBITRAGE_ADMIN_ROLE, msg.sender);
+        _;
+    }
+
+    function initialize(address _wethAddress, address _aavePoolAddressesProviderRegistry, address _initialAdmin) external {
+        LibAccessControl.enforceRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        AppStorage storage s = LibAppStorage.getStorage();
+        
+        require(s.WETH_ADDRESS == address(0), "ArbitrageFacet: Already initialized");
+        require(_wethAddress != address(0) && _aavePoolAddressesProviderRegistry != address(0) && _initialAdmin != address(0), "ArbitrageFacet: Zero address");
+
+        s.WETH_ADDRESS = _wethAddress;
+        s.AAVE_POOL_ADDRESSES_PROVIDER = IPoolAddressesProvider(_aavePoolAddressesProviderRegistry);
+
+        // Setup role hierarchy: DEFAULT_ADMIN_ROLE can manage ARBITRAGE_ADMIN_ROLE
+        LibAccessControl.setRoleAdmin(ARBITRAGE_ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
+        // Grant the new role to the specified admin
+        LibAccessControl.grantRole(ARBITRAGE_ADMIN_ROLE, _initialAdmin);
+        // Grant the role to the deployer as well if they are different
+        if (msg.sender != _initialAdmin) {
+            LibAccessControl.grantRole(ARBITRAGE_ADMIN_ROLE, msg.sender);
+        }
+        emit ArbitrageRolesInitialized(_initialAdmin);
+    }
+
+    function executeAaveArbitrage(
+        address _loanAsset,
+        uint256 _loanAmount,
+        ActionSwapParams calldata _legA,
+        ActionSwapParams calldata _legB,
+        uint256 _minNetProfitLoanAsset
+    ) external nonReentrant {
+        AppStorage storage s = LibAppStorage.getStorage();
+        if (_loanAmount == 0) revert AE_ZeroAmount("Loan amount must be > 0");
+        if (_legA.recipient != address(this) || _legB.recipient != address(this)) {
+            revert AE_InvalidCallback("Leg recipient must be this contract");
+        }
+
+        // Path validation
+        TokenInfo memory tokenInInfoA = LibTokenHelper.getTokenById(_legA.tokenInId);
+        TokenInfo memory tokenOutInfoB = LibTokenHelper.getTokenById(_legB.tokenOutId);
+        if (tokenInInfoA.tokenAddress != _loanAsset || tokenOutInfoB.tokenAddress != _loanAsset) {
+            revert AE_PathMismatch("Leg A in / Leg B out must be loan asset");
+        }
+
+        TokenInfo memory tokenOutInfoA = LibTokenHelper.getTokenById(_legA.tokenOutId);
+        TokenInfo memory tokenInInfoB = LibTokenHelper.getTokenById(_legB.tokenInId);
+        if (tokenOutInfoA.tokenAddress != tokenInInfoB.tokenAddress) {
+            revert AE_PathMismatch("Leg A out != Leg B in (must be intermediate asset)");
+        }
+        if (tokenInInfoA.tokenAddress == tokenOutInfoA.tokenAddress) {
+            revert AE_PathMismatch("Loan and intermediate asset cannot be same");
+        }
+
+        bytes memory params = abi.encode(
+            ArbitrageCallbackData({
+                loanAsset: _loanAsset,
+                loanAmount: _loanAmount,
+                legA: _legA,
+                legB: _legB,
+                minNetProfitLoanAsset: _minNetProfitLoanAsset,
+                initiator: msg.sender
+            })
+        );
+
+        address[] memory assets = new address[](1);
+        assets[0] = _loanAsset;
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = _loanAmount;
+        uint256[] memory modes = new uint256[](1);
+        modes[0] = 0; // No debt tokenization
+
+        IPool aavePool = IPool(s.AAVE_POOL_ADDRESSES_PROVIDER.getPool());
+        aavePool.flashLoan(address(this), assets, amounts, modes, address(this), params, 0);
+    }
+
+    function executeOperation(
+        address[] calldata assets,
+        uint256[] calldata receivedAmounts,
+        uint256[] calldata premiums,
+        address, // initiator from Aave is not used
+        bytes calldata paramsData
+    ) external override returns (bool) {
+        AppStorage storage s = LibAppStorage.getStorage();
+        IPool aavePool = IPool(s.AAVE_POOL_ADDRESSES_PROVIDER.getPool());
+        if (msg.sender != address(aavePool)) revert AE_CallerNotAavePool();
+        if (assets.length != 1) revert AE_ArrayLengthMismatch();
+
+        ArbitrageCallbackData memory data = abi.decode(paramsData, (ArbitrageCallbackData));
+
+        if (data.loanAsset != assets[0]) {
+            revert AE_PathMismatch("Callback loan asset mismatch with Aave provided asset.");
+        }
+        if (data.loanAmount != receivedAmounts[0]) revert AE_FlashLoanFailed();
+
+        // Setup Leg A
+        ActionSwapParams memory legAParams = data.legA;
+        legAParams.amountIn = receivedAmounts[0];
+        // The diamond itself holds the facet addresses
+        legAParams.exchangeHelperAddress = address(this);
+        legAParams.tokenHelperAddress = address(this);
+        legAParams.contractRegistryAddress = address(this);
+        legAParams.wethAddress = s.WETH_ADDRESS;
+
+        // Execute Leg A
+        (, ActionSwapReturn memory legAReturn) = LibExchangeActions.swap(legAParams);
+        uint256 intermediateAmountReceived = legAReturn.amountOut;
+        if (intermediateAmountReceived == 0 && legAParams.amountIn > 0) revert AE_FlashLoanFailed();
+
+        // Setup Leg B
+        ActionSwapParams memory legBParams = data.legB;
+        legBParams.amountIn = intermediateAmountReceived;
+        legBParams.exchangeHelperAddress = address(this);
+        legBParams.tokenHelperAddress = address(this);
+        legBParams.contractRegistryAddress = address(this);
+        legBParams.wethAddress = s.WETH_ADDRESS;
+
+        // Execute Leg B
+        (, ActionSwapReturn memory legBReturn) = LibExchangeActions.swap(legBParams);
+        uint256 finalLoanAssetAmount = legBReturn.amountOut;
+        if (finalLoanAssetAmount == 0 && legBParams.amountIn > 0) revert AE_FlashLoanFailed();
+
+        // Profit Check & Repayment
+        uint256 totalRepaymentAmount = data.loanAmount + premiums[0];
+        if (finalLoanAssetAmount < totalRepaymentAmount + data.minNetProfitLoanAsset) {
+            revert AE_NotEnoughProfit();
+        }
+        uint256 actualProfit = finalLoanAssetAmount - totalRepaymentAmount;
+        s.profitTracker[data.loanAsset] += actualProfit;
+
+        // Repay Aave
+        IERC20(data.loanAsset).approve(address(aavePool), totalRepaymentAmount);
+
+        // Emit event
+        address intermediateTokenAddress = LibTokenHelper.getTokenById(legAParams.tokenOutId).tokenAddress;
+        emit ArbitrageExecuted(
+            data.loanAsset,
+            data.loanAmount,
+            intermediateTokenAddress,
+            intermediateAmountReceived,
+            finalLoanAssetAmount,
+            actualProfit,
+            data.initiator
+        );
+
+        return true;
+    }
+
+    function withdrawTokens(address _tokenAddress, address _to, uint256 _amount) external onlyArbitrageAdmin {
+        if (_to == address(0)) revert AE_InvalidCallback("Invalid recipient for withdraw");
+        uint256 amountToWithdraw = _amount;
+        if (_tokenAddress == address(0)) {
+            // ETH
+            uint256 balance = address(this).balance;
+            if (amountToWithdraw == 0) amountToWithdraw = balance;
+            if (amountToWithdraw > balance) revert AE_InsufficientBalance("Insufficient ETH balance");
+            payable(_to).transfer(amountToWithdraw);
+        } else {
+            // ERC20
+            uint256 balance = IERC20(_tokenAddress).balanceOf(address(this));
+            if (amountToWithdraw == 0) amountToWithdraw = balance;
+            if (amountToWithdraw > balance) revert AE_InsufficientBalance("Insufficient token balance");
+            IERC20(_tokenAddress).safeTransfer(_to, amountToWithdraw);
+        }
+        emit ProfitWithdrawn(_tokenAddress, _to, amountToWithdraw);
+    }
+}
+// [ src/facets/Arbitrage/ArbitrageFacet.sol <= END ]
+//******************************\\
+//******************************\\
+// [ START => src/facets/Arbitrage/ArbitrageFacetV2.sol ]
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {IArbitrageV2, ArbitragePoolPair, ResolvedArbitragePath, NoProfitablePathFound} from "./IArbitrageV2.sol";
+import {LibArbitrageCalculator} from "./LibArbitrageCalculator.sol";
+import {LibAppStorage} from "../../libraries/LibAppStorage.sol";
+import {ActionSwapParams} from "../ExchangeHelper/LibExchangeActions.sol";
+import {ITokenHelper} from "../TokenHelper/ITokenHelper.sol";
+import {IUniswapV3Pool} from "../../interfaces/IUniswapV3.sol";
+import {ExchangeCategory} from "../ExchangeHelper/IExchangeHelper.sol";
+import {ArbitrageFacet} from "./ArbitrageFacet.sol";
+
+/**
+ * @title ArbitrageFacetV2
+ * @author Gemini
+ * @notice An advanced facet for automatically analyzing and executing arbitrage opportunities between pairs of liquidity pools.
+ * @dev This contract acts as an orchestrator. It uses LibArbitrageCalculator to find profitable paths
+ *      and then calls the original ArbitrageFacet's execution logic to perform the flash loan and swaps.
+ *      This promotes code reuse and separation of concerns.
+ */
+contract ArbitrageFacetV2 is IArbitrageV2, ReentrancyGuard {
+    /**
+     * @notice Main entry point for executing a batch of arbitrage opportunities.
+     * @dev Loops through each provided pool pair, assesses it for profitability, and executes if a valid opportunity is found.
+     *      Uses a try/catch block to ensure that one failed assessment does not halt the entire batch.
+     * @param opportunities An array of pool pairs to analyze.
+     */
+    function executePoolPairArbitrage(ArbitragePoolPair[] calldata opportunities)
+        external
+        override
+        nonReentrant
+    {
+        for (uint i = 0; i < opportunities.length; i++) {
+            try this.assessOpportunity(opportunities[i]) returns (ResolvedArbitragePath memory path) {
+                // This block executes only if assessOpportunity finds a profitable path and does not revert.
+                if (path.profitable) {
+                    emit PathAssessed(
+                        opportunities[i].poolA,
+                        opportunities[i].poolB,
+                        true,
+                        path.loanAsset,
+                        path.loanAmount,
+                        path.expectedProfit
+                    );
+
+                    // Call the original `executeAaveArbitrage` function on the diamond.
+                    // This reuses the existing, tested flash loan callback mechanism.
+                    ArbitrageFacet(address(this)).executeAaveArbitrage(
+                        path.loanAsset,
+                        path.loanAmount,
+                        path.legA,
+                        path.legB,
+                        0 // We set min profit to 0 because we've already assessed it on-chain.
+                    );
+                }
+            } catch {
+                // If assessOpportunity reverts (e.g., NoProfitablePathFound), we catch it and continue.
+                // This makes the batch execution robust.
+                emit PathAssessed(opportunities[i].poolA, opportunities[i].poolB, false, address(0), 0, 0);
+                // Continue to the next opportunity in the loop.
+            }
+        }
+    }
+
+    /**
+     * @notice A view-only function to assess an opportunity without executing it.
+     * @dev This is useful for off-chain bots to quickly check if an on-chain execution is likely to succeed.
+     * @param opportunity The pair of pools to analyze.
+     * @return A struct containing the resolved, profitable path, if one exists. Reverts if no profitable path is found.
+     */
+    function assessOpportunity(ArbitragePoolPair calldata opportunity)
+        public
+        view
+        override
+        returns (ResolvedArbitragePath memory)
+    {
+        // 1. Get standardized information for both pools.
+        LibArbitrageCalculator.PoolInfo memory infoA = LibArbitrageCalculator.getPoolInfo(opportunity.poolA);
+        LibArbitrageCalculator.PoolInfo memory infoB = LibArbitrageCalculator.getPoolInfo(opportunity.poolB);
+
+        // 2. Determine the arbitrage path (which token is the pivot).
+        (address tokenX, address tokenY, address pivotToken) =
+            LibArbitrageCalculator.findArbitragePath(infoA, infoB);
+
+        // 3. Assess both possible directions for the arbitrage.
+        // Path 1: Loan X, swap X -> Pivot (in pool A), swap Pivot -> X (in pool B)
+        (bool profitable1, ResolvedArbitragePath memory path1) =
+            _assessSingleDirection(tokenX, pivotToken, infoA, infoB, opportunity);
+
+        // Path 2: Loan Y, swap Y -> Pivot (in pool B), swap Pivot -> Y (in pool A)
+        (bool profitable2, ResolvedArbitragePath memory path2) =
+            _assessSingleDirection(tokenY, pivotToken, infoB, infoA, opportunity);
+
+        // 4. Return the most profitable path or revert if neither is profitable.
+        if (profitable1 && (!profitable2 || path1.expectedProfit > path2.expectedProfit)) {
+            return path1;
+        }
+        if (profitable2) {
+            return path2;
+        }
+
+        revert NoProfitablePathFound();
+    }
+
+    /**
+     * @dev Internal view function to check one direction of an arbitrage and construct the execution parameters.
+     * @param startToken The token to flash loan and start the arbitrage with.
+     * @param pivotToken The intermediate token to swap through.
+     * @param pool1 The first pool in the swap path (Start -> Pivot).
+     * @param pool2 The second pool in the swap path (Pivot -> Start).
+     * @param opportunity The original pool pair data containing exchange IDs and addresses.
+     * @return A boolean indicating profitability and the fully constructed ResolvedArbitragePath.
+     */
+    function _assessSingleDirection(
+        address startToken,
+        address pivotToken,
+        LibArbitrageCalculator.PoolInfo memory pool1,
+        LibArbitrageCalculator.PoolInfo memory pool2,
+        ArbitragePoolPair calldata opportunity
+    ) private view returns (bool, ResolvedArbitragePath memory) {
+        // Calculate a conservative loan amount to minimize slippage.
+        uint256 loanAmount = LibArbitrageCalculator.calculateLoanAmount(pool1, startToken);
+        if (loanAmount == 0) return (false, ResolvedArbitragePath(false, address(0), 0, ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), 0));
+
+        // Quote the two legs of the swap.
+        uint256 pivotAmount = LibArbitrageCalculator.quote(loanAmount, pool1, startToken);
+        if (pivotAmount == 0) return (false, ResolvedArbitragePath(false, address(0), 0, ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), 0));
+        
+        uint256 finalAmount = LibArbitrageCalculator.quote(pivotAmount, pool2, pivotToken);
+
+        // Account for the Aave flash loan fee (0.09%).
+        uint256 flashFee = (loanAmount * 9) / 10000;
+
+        if (finalAmount > loanAmount + flashFee) {
+            uint256 profit = finalAmount - (loanAmount + flashFee);
+
+            // If profitable, construct the full ActionSwapParams for execution.
+            ITokenHelper tokenHelper = ITokenHelper(address(this));
+            uint16 startTokenId = tokenHelper.getTokenIdByAddress(startToken);
+            uint16 pivotTokenId = tokenHelper.getTokenIdByAddress(pivotToken);
+
+            bytes memory extraParamsA;
+            if (pool1.category == ExchangeCategory.UniswapV3) {
+                extraParamsA = abi.encode(IUniswapV3Pool(opportunity.poolA).fee());
+            }
+
+            bytes memory extraParamsB;
+            if (pool2.category == ExchangeCategory.UniswapV3) {
+                extraParamsB = abi.encode(IUniswapV3Pool(opportunity.poolB).fee());
+            }
+
+            address diamondAddr = address(this);
+            address wethAddr = LibAppStorage.getStorage().WETH_ADDRESS;
+
+            ActionSwapParams memory legA = ActionSwapParams(
+                diamondAddr, diamondAddr, diamondAddr, wethAddr,
+                opportunity.exchangeIdA, startTokenId, pivotTokenId,
+                loanAmount, 0, diamondAddr, extraParamsA
+            );
+            ActionSwapParams memory legB = ActionSwapParams(
+                diamondAddr, diamondAddr, diamondAddr, wethAddr,
+                opportunity.exchangeIdB, pivotTokenId, startTokenId,
+                pivotAmount, 0, diamondAddr, extraParamsB
+            );
+
+            return (true, ResolvedArbitragePath(true, startToken, loanAmount, legA, legB, profit));
+        }
+
+        // Return a default "not profitable" struct.
+        return (false, ResolvedArbitragePath(false, address(0), 0, ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), 0));
+    }
+}
+// [ src/facets/Arbitrage/ArbitrageFacetV2.sol <= END ]
+//******************************\\
+//******************************\\
+// [ START => src/facets/Arbitrage/IArbitrageV2.sol ]
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import {ActionSwapParams} from "../ExchangeHelper/LibExchangeActions.sol";
+
+// Represents a potential arbitrage opportunity between two pools.
+// The contract will figure out the tokens and path.
+// We include the exchange IDs so the contract can look up the correct exchange info.
+struct ArbitragePoolPair {
+    uint16 exchangeIdA;
+    address poolA;
+    uint16 exchangeIdB;
+    address poolB;
+}
+
+// A fully resolved, profitable arbitrage path ready for execution.
+struct ResolvedArbitragePath {
+    bool profitable;
+    address loanAsset;
+    uint256 loanAmount;
+    ActionSwapParams legA;
+    ActionSwapParams legB;
+    uint256 expectedProfit;
+}
+
+// Custom errors for the new facet and library.
+error PoolsDoNotShareToken();
+error PoolInfoQueryFailed();
+error ReserveCalculationError();
+error NoProfitablePathFound();
+
+interface IArbitrageV2 {
+    event PathAssessed(
+        address indexed poolA,
+        address indexed poolB,
+        bool profitable,
+        address loanAsset,
+        uint256 loanAmount,
+        uint256 expectedProfit
+    );
+
+    /**
+     * @notice Analyzes and executes a batch of arbitrage opportunities defined by pairs of pools.
+     * @param opportunities An array of pool pairs to analyze and execute if profitable.
+     */
+    function executePoolPairArbitrage(ArbitragePoolPair[] calldata opportunities) external;
+
+    /**
+     * @notice A view-only function to assess an opportunity without executing it.
+     * @param opportunity The pair of pools to analyze.
+     * @return A struct containing the resolved, profitable path, if one exists.
+     */
+    function assessOpportunity(ArbitragePoolPair calldata opportunity) external view returns (ResolvedArbitragePath memory);
+}
+// [ src/facets/Arbitrage/IArbitrageV2.sol <= END ]
+//******************************\\
+//******************************\\
+// [ START => src/facets/Arbitrage/LibArbitrageCalculator.sol ]
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import {IUniswapV2Pair} from "../../interfaces/IUniswapV2.sol";
+import {IUniswapV3Pool} from "../../interfaces/IUniswapV3.sol";
+import {LibExchangeUtils} from "../ExchangeHelper/LibExchangeUtils.sol";
+import {ExchangeCategory} from "../ExchangeHelper/IExchangeHelper.sol";
+import {PoolsDoNotShareToken, PoolInfoQueryFailed, ReserveCalculationError} from "./IArbitrageV2.sol";
+
+library LibArbitrageCalculator {
+    // Heuristic: Loan amount will be a percentage of the smaller reserve of the two pools.
+    // 100 BPS = 1%. This is a conservative value to minimize slippage.
+    uint256 constant LOAN_PERCENTAGE_BPS = 100;
+
+    struct PoolInfo {
+        ExchangeCategory category;
+        address token0;
+        address token1;
+        uint256 reserve0;
+        uint256 reserve1;
+    }
+
+    /**
+     * @notice Analyzes a pool to get its type, tokens, and reserves.
+     * @dev Abstracts the differences between V2 and V3 pools for easier analysis.
+     */
+    function getPoolInfo(address poolAddress) internal view returns (PoolInfo memory) {
+        (ExchangeCategory category, bool success) = LibExchangeUtils.detectExchangeType(poolAddress);
+        if (!success || category == ExchangeCategory.Unknown) revert PoolInfoQueryFailed();
+
+        if (category == ExchangeCategory.UniswapV2) {
+            IUniswapV2Pair pair = IUniswapV2Pair(poolAddress);
+            (uint112 r0, uint112 r1, ) = pair.getReserves();
+            return PoolInfo(category, pair.token0(), pair.token1(), r0, r1);
+        } else if (category == ExchangeCategory.UniswapV3) {
+            IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
+            // V3 "reserves" are not stored directly. We use liquidity as a proxy for our heuristic.
+            // A more advanced implementation would calculate virtual reserves based on the current tick.
+            uint128 liquidity = pool.liquidity();
+            return PoolInfo(category, pool.token0(), pool.token1(), liquidity, liquidity);
+        }
+        revert PoolInfoQueryFailed();
+    }
+
+    /**
+     * @notice Given two pools, finds the common pivot token and the two outer tokens.
+     * @return tokenOuterA The non-pivot token from the first pool.
+     * @return tokenOuterB The non-pivot token from the second pool.
+     * @return pivotToken The token shared between both pools.
+     */
+    function findArbitragePath(PoolInfo memory infoA, PoolInfo memory infoB)
+        internal
+        pure
+        returns (address tokenOuterA, address tokenOuterB, address pivotToken)
+    {
+        if (infoA.token0 == infoB.token0 || infoA.token0 == infoB.token1) {
+            pivotToken = infoA.token0;
+            tokenOuterA = infoA.token1;
+            tokenOuterB = (pivotToken == infoB.token0) ? infoB.token1 : infoB.token0;
+        } else if (infoA.token1 == infoB.token0 || infoA.token1 == infoB.token1) {
+            pivotToken = infoA.token1;
+            tokenOuterA = infoA.token0;
+            tokenOuterB = (pivotToken == infoB.token0) ? infoB.token1 : infoB.token0;
+        } else {
+            revert PoolsDoNotShareToken();
+        }
+    }
+
+    /**
+     * @notice Calculates the flash loan amount based on a percentage of the relevant reserve.
+     */
+    function calculateLoanAmount(PoolInfo memory info, address loanToken) internal pure returns (uint256) {
+        uint256 reserve = (info.token0 == loanToken) ? info.reserve0 : info.reserve1;
+        if (reserve == 0) revert ReserveCalculationError();
+        return (reserve * LOAN_PERCENTAGE_BPS) / 10000;
+    }
+
+    /**
+     * @notice Simulates a swap to get an estimated output amount.
+     * @dev This is a simplified on-chain quotation function. Production versions would be more complex.
+     */
+    function quote(uint256 amountIn, PoolInfo memory pool, address tokenIn) internal pure returns (uint256 amountOut) {
+        if (pool.category == ExchangeCategory.UniswapV2) {
+            uint256 reserveIn = (pool.token0 == tokenIn) ? pool.reserve0 : pool.reserve1;
+            uint256 reserveOut = (pool.token0 == tokenIn) ? pool.reserve1 : pool.reserve0;
+            
+            uint256 amountInWithFee = amountIn * 997;
+            uint256 numerator = amountInWithFee * reserveOut;
+            uint256 denominator = (reserveIn * 1000) + amountInWithFee;
+            if (denominator == 0) return 0;
+            return numerator / denominator;
+        } else if (pool.category == ExchangeCategory.UniswapV3) {
+            // V3 quoting is very complex. We use a simple ratio of liquidity as a rough heuristic.
+            // This is NOT precise and should be replaced with a call to a Quoter contract for production.
+            uint256 reserveIn = (pool.token0 == tokenIn) ? pool.reserve0 : pool.reserve1;
+            uint256 reserveOut = (pool.token0 == tokenIn) ? pool.reserve1 : pool.reserve0;
+            if (reserveIn == 0) return 0;
+            // This is a very rough estimate and ignores the price curve.
+            return (amountIn * reserveOut) / reserveIn;
+        }
+        return 0;
+    }
+}
+// [ src/facets/Arbitrage/LibArbitrageCalculator.sol <= END ]
+//******************************\\
