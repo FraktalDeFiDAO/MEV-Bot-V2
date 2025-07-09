@@ -106,7 +106,7 @@ contract VerifyDiamond is Script, HelperContract {
     }
 
     function _verifyContract(Transaction memory tx, string memory contractPath, string memory apiKey) private {
-        console.log(unicode"\nVerifying", tx.contractName, "at", tx.contractAddress, "...");
+        console.log(unicode"\nVerifying", tx.contractName, tx.contractAddress, "...");
         string[] memory inputs = new string[](8);
         inputs[0] = "forge";
         inputs[1] = "verify-contract";

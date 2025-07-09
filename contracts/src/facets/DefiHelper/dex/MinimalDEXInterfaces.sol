@@ -1,6 +1,6 @@
 // File: src/facets/DefiHelper/dex/MinimalDEXInterfaces.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0; // Or your project's Solidity version
+pragma solidity 0.8.28; // Or your project's Solidity version
 
 // --- Balancer V2 Structs and Interface ---
 

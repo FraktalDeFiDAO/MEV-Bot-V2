@@ -5,7 +5,7 @@ build-bot:
 
 build-contracts:
 	@docker compose run smart-contracts-dev \
-		'bash -c "forge build --force --skip test"'
+	bash -c "forge build --force --skip test --skip script/Bindings-0.7.sol"
 
 generate-contract-bindings:
 	@sh -c "./generate_bindings.sh"
