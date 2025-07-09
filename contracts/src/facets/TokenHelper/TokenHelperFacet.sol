@@ -1,8 +1,8 @@
 // File: src/facets/TokenHelper/TokenHelperFacet.sol
 // SPDX-License-Identifier: Fraktal-Protocol
-pragma solidity ^0.8.0;
+pragma solidity 0.8.28;
 
-import "lib/OpenZeppelin/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {
     ITokenHelper,
     TOKEN_ADMIN_ROLE,
