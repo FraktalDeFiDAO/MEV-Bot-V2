@@ -52,4 +52,4 @@ test-bot:
 	@docker compose run --rm mev-bot-v2-dev sh -c "go test ./..."
 
 test-contracts:
-	@docker compose run --rm smart-contracts-dev "forge test --fork-url $${MAINNET_RPC_URL} -vv"
+	@docker compose run --rm smart-contracts-dev "forge test --fork-url arbitrum -vv"
