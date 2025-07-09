@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.28;
 
 /******************************************************************************\
  * 
@@ -20,5 +20,4 @@ interface IDiamond {
         bytes4[] functionSelectors;
     }
 
-    event DiamondCut(FacetCut[] _diamondCut, address _init, bytes _calldata);
-}
+    event DiamondCut(FacetCut[] _diamondCut, address _init, bytes _calldata);}
