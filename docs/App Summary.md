@@ -8,7 +8,7 @@ This document provides a comprehensive overview of the MEV (Maximal Extractable 
 
 The system is a sophisticated MEV bot designed to detect and execute arbitrage opportunities on DEXs. It consists of two main components:
 
-1.  **On-Chain Smart Contracts (`smart-contracts/`)**: A modular and upgradable smart contract system built using the **EIP-2535 Diamond Standard**. This diamond contract is the single entry point for all on-chain operations. Different "facets" (contracts) are attached to the diamond to handle specific functionalities like access control, arbitrage execution, and managing registries for tokens and exchanges. The core arbitrage logic is centered around receiving a flash loan from a protocol like Aave, performing a series of swaps across different liquidity pools, and repaying the loan with a profit in a single atomic transaction.
+1.  **On-Chain Smart Contracts (`contracts/`)**: A modular and upgradable smart contract system built using the **EIP-2535 Diamond Standard**. This diamond contract is the single entry point for all on-chain operations. Different "facets" (contracts) are attached to the diamond to handle specific functionalities like access control, arbitrage execution, and managing registries for tokens and exchanges. The core arbitrage logic is centered around receiving a flash loan from a protocol like Aave, performing a series of swaps across different liquidity pools, and repaying the loan with a profit in a single atomic transaction.
 
 2.  **Off-Chain Go Bot (`bot/`)**: A Go application that performs the heavy lifting of market analysis. It runs in two distinct modes:
     * **Dispatcher Mode**: This mode is responsible for scanning the blockchain. It subscribes to new blocks and swap events, discovers new liquidity pools, parses event data, calculates prices, caches market states, and constantly scans for price discrepancies between pools that represent an arbitrage opportunity. When an opportunity is found, it broadcasts the details over a WebSocket connection.
@@ -36,7 +36,17 @@ This file orchestrates the local development environment using Docker, defining 
 
 * **`smart-contracts-dev` service**:
     * **Intent**: To provide an environment for compiling, deploying, and interacting with the Solidity smart contracts.
-    * **Mechanics**: It uses a Foundry image and mounts the `smart-contracts/` directory. Like the bot, its `RPC_URL` is set to point to the `anvil` service, so `forge` scripts (like deployment and upgrades) can be run from within this container against the local forked chain.
+  * **Mechanics**: It uses a Foundry image and mounts the `contracts/` directory. Like the bot, its `RPC_URL` is set to point to the `anvil` service, so `forge` scripts (like deployment and upgrades) can be run from within this container against the local forked chain.
+
+### Using the Makefile
+
+Common tasks are wrapped in a Makefile for convenience:
+
+```bash
+make setup      # Build images, install deps, and create a .env file if needed
+make run-dev    # Build the bot and start it together with Anvil
+make down       # Stop all running containers
+```
 
 ---
 
@@ -49,13 +59,13 @@ This is a utility script to automate the creation of Go bindings for the Solidit
 * **Mechanics**:
     1.  It first runs `forge build --via-ir` to ensure all smart contract artifacts (`.json` files containing ABI and bytecode) are up-to-date. The `--via-ir` flag is used for optimization and may be required for complex contracts.
     2.  It defines a list of contracts (`CONTRACTS`) for which bindings should be generated.
-    3.  It iterates through this list, finding the corresponding JSON artifact in the `smart-contracts/out/` directory.
+    3.  It iterates through this list, finding the corresponding JSON artifact in the `contracts/out/` directory.
     4.  It uses the `abigen` tool (part of `go-ethereum`) to generate a Go file for each contract. It extracts the ABI and bytecode from the JSON artifact and passes them to `abigen`.
     5.  The generated Go files are placed in the `bot/contracts/bindings/` directory, organized into sub-packages named after each contract.
 
 ---
 
-## Smart Contracts (`smart-contracts/`)
+## Smart Contracts (`contracts/`)
 
 The on-chain component is architected as an EIP-2535 Diamond, providing modularity and upgradability.
 
@@ -175,8 +185,9 @@ These contracts provide registry and utility services to the main arbitrage syst
 * **Intent**: To manage information about different DEXs. It complements the `ContractRegistry` by linking a DEX's name and platform type (e.g., UniswapV2) to its router/factory contract ID in the registry.
 * **`IExchangeHelper.sol`**: Defines enums for `ExchangePlatform` and `ExchangeCategory`, the `Exchange` struct, and the `EXCHANGE_HELPER_ADMIN_ROLE`. 
 * **`LibExchangeHelperStorage.sol`**: Manages the storage for exchange information. 
-* **`LibExchangeUtils.sol`**: A utility library with functions to detect a pool's type (`detectExchangeType`) by checking for the existence of specific functions (duck-typing) and to derive a pool address from its factory and tokens (`getPoolOrPairAddress`). 
-* **`ExchangeHelperFacet.sol`**: The external, access-controlled interface for managing exchange data. 
+* **`LibExchangeUtils.sol`**: A utility library with functions to detect a pool's type (`detectExchangeType`) by checking for the existence of specific functions (duck-typing) and to derive a pool address from its factory and tokens (`getPoolOrPairAddress`).
+* **`LibArbitrageCalculator.sol`**: New library for analyzing two pools, determining the common pivot token, and estimating flash loan amounts and swap outputs.
+* **`ExchangeHelperFacet.sol`**: The external, access-controlled interface for managing exchange data.
 
 ---
 
