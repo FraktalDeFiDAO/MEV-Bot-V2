@@ -85,6 +85,13 @@ Navigate to the `contracts` directory.
 
 forge install
 
+Compile:
+Use Foundry to build the contracts without optional 0.7.x scripts:
+
+```bash
+forge build --skip script --skip script/Bindings-0.7.sol --skip test
+```
+
 Run Tests:  
 Ensure you have a MAINNET\_RPC\_URL variable set in your environment.  
 forge test \--fork-url $MAINNET\_RPC\_URL \-vv
