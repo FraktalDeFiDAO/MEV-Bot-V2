@@ -13,7 +13,7 @@
 
 These are industry-standard, audited contracts that provide robust implementations of common patterns. Understanding them is crucial as the application relies on their correctness and security.
 
-#### **Location: `smart-contracts/dependencies/@uniswap-v3-periphery-1.4.4/node_modules/@openzeppelin/contracts/`**
+#### **Location: `contracts/dependencies/@uniswap-v3-periphery-1.4.4/node_modules/@openzeppelin/contracts/`**
 
 ##### **`utils/Context.sol`**
 
@@ -104,7 +104,7 @@ These are industry-standard, audited contracts that provide robust implementatio
 
 These files define the interfaces and libraries required to interact with Uniswap, a primary target for the arbitrage bot. The bot needs to be able to understand pool states and execute swaps.
 
-#### **Location: `smart-contracts/dependencies/@uniswap-v3-core/`**
+#### **Location: `contracts/dependencies/@uniswap-v3-core/`**
 
 ##### `interfaces/IUniswapV3Pool.sol` and its components (`/pool/`)
 
@@ -143,7 +143,7 @@ These files define the interfaces and libraries required to interact with Uniswa
 * **`getTickAtSqrtRatio(uint160 sqrtPriceX96)`**:
   * **Low-Level:** This is the inverse operation, calculating `floor(log_sqrt(1.0001)(sqrtPriceX96))`. It's another highly optimized function that uses bit manipulation and a series of fixed-point multiplications to approximate the logarithm, avoiding expensive `log` opcodes.
 
-#### **Location: `smart-contracts/dependencies/@uniswap-v3-periphery/`**
+#### **Location: `contracts/dependencies/@uniswap-v3-periphery/`**
 
 ##### `interfaces/ISwapRouter.sol`
 
@@ -286,7 +286,7 @@ This completes the exhaustive analysis of the system's "database" layer. We can 
 
 This facet and its associated libraries form a sophisticated abstraction layer over various decentralized exchanges. Its primary purpose is to allow the `ArbitrageFacet` to request a swap with a simple, standardized set of parameters, without needing to know the specific, often incompatible, implementation details of each DEX.
 
-#### **Location: `smart-contracts/src/facets/ExchangeHelper/`**
+#### **Location: `contracts/src/facets/ExchangeHelper/`**
 
 ##### **`IExchangeHelper.sol` & `IExchanges.sol`**
 

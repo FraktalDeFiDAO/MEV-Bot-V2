@@ -11,7 +11,7 @@ set -e
 set -o pipefail
 
 # --- Configuration ---
-FOUNDRY_PROJECT_ROOT="smart-contracts"
+FOUNDRY_PROJECT_ROOT="contracts"
 BINDINGS_DIR="bot/contracts/bindings"
 TEMP_ARCHIVE_DIR="temp_build_archive"
 

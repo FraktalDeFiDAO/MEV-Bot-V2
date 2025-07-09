@@ -20,7 +20,7 @@ run-bot:
 
 
 gen-codebase:
-	@codebase-gen -dir ./smart-contracts/ \
+        @codebase-gen -dir ./contracts/ \
 		-iname "*.sol" -out codebase_sol.txt  \
 		-exclude "*/lib/*" && \
 		codebase-gen -dir ./bot/ -iname "*.go" \

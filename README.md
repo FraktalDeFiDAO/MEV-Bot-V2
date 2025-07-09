@@ -79,7 +79,7 @@ make down
 
 ### **1\. Smart Contracts**
 
-Navigate to the smart-contracts directory.
+Navigate to the `contracts` directory.
 
 **Install Dependencies:**
 

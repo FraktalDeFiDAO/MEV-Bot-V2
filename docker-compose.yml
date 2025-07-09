@@ -30,7 +30,7 @@ services:
     container_name: mev-bot-contracts-dev
     image: ghcr.io/foundry-rs/foundry:stable
     volumes:
-      - ./smart-contracts:/home/foundry/app
+      - ./contracts:/home/foundry/app
     working_dir: /home/foundry/app
     # Set the RPC_URL so you can run scripts inside the container against Anvil
     environment:
@@ -52,5 +52,4 @@ services:
       --fork-block-number ${FORK_BLOCK_NUMBER}
       --host 0.0.0.0
       --chain-id 31337 
-    ports:
-      - "8545:8545"
+    ports:      - "8545:8545"
