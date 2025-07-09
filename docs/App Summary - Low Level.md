@@ -336,6 +336,12 @@ This facet and its associated libraries form a sophisticated abstraction layer o
     * If `getPair` succeeds and returns a non-zero address, it then calls `isExchangeType(pair, ExchangeCategory.UniswapV2)` to double-check that the returned address is indeed a V2-like pool, before returning it.
     * The logic is repeated for the V3 `getPool` function. This sequential probing makes the function agnostic to the factory type.
 
+##### **`LibArbitrageCalculator.sol`**
+
+* **File Purpose:** Provides on-chain helpers for finding the shared pivot token between two pools, estimating the flash loan size as a percentage of reserves, and performing lightweight swap quotations.
+* **Key Functions:** `getPoolInfo` (abstracts V2 vs. V3 pool state), `findArbitragePath` (returns the outer tokens and common pivot), and `calculateLoanAmount` (1% of the relevant reserve).
+* **Usage:** Called by the Arbitrage facet to simulate potential trades before executing the flash-loan sequence.
+
 ##### **`LibExchangeActions.sol`**
 
 * **File Purpose:** This is the action-oriented counterpart to the other helper libraries. It takes the information provided by `TokenHelper` and `ExchangeHelper` and uses it to execute swaps.
