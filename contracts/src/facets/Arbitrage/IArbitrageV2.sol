@@ -1,31 +1,43 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @notice Thrown when two pools do not share a common token for arbitrage
-error PoolsDoNotShareToken();
-/// @notice Thrown when pool metadata cannot be queried
-error PoolInfoQueryFailed();
-/// @notice Thrown when reserves cannot be calculated from pool data
-error ReserveCalculationError();
+import {ActionSwapParams} from "../ExchangeHelper/LibExchangeActions.sol";
 
-/// @notice Thrown when no profitable arbitrage path is found
+/// Represents a potential arbitrage opportunity between two pools with their associated exchange IDs
+struct ArbitragePoolPair {
+    uint16 exchangeIdA;
+    address poolA;
+    uint16 exchangeIdB;
+    address poolB;
+}
+
+/// A fully resolved, profitable arbitrage path ready for execution
+struct ResolvedArbitragePath {
+    bool profitable;
+    address loanAsset;
+    uint256 loanAmount;
+    ActionSwapParams legA;
+    ActionSwapParams legB;
+    uint256 expectedProfit;
+}
+
+// Custom errors
+error PoolsDoNotShareToken();
+error PoolInfoQueryFailed();
+error ReserveCalculationError();
 error NoProfitablePathFound();
 
-/// @notice Represents a pair of liquidity pools used for arbitrage
-struct ArbitragePoolPair {
-    address pool0;
-    address pool1;
-}
-
-/// @notice Represents a resolved path for arbitrage swaps
-struct ResolvedArbitragePath {
-    address[] swapPath;
-}
-
-/// @dev Minimal interface for arbitrage helpers used by other facets
 interface IArbitrageV2 {
-    function findProfitablePath(
-        ArbitragePoolPair calldata pools,
-        uint256 amountIn
-    ) external view returns (ResolvedArbitragePath memory path);
+    event PathAssessed(
+        address indexed poolA,
+        address indexed poolB,
+        bool profitable,
+        address loanAsset,
+        uint256 loanAmount,
+        uint256 expectedProfit
+    );
+
+    function executePoolPairArbitrage(ArbitragePoolPair[] calldata opportunities) external;
+
+    function assessOpportunity(ArbitragePoolPair calldata opportunity) external view returns (ResolvedArbitragePath memory);
 }
