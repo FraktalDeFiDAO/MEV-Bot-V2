@@ -51,6 +51,5 @@ services:
       --fork-url ${ARBITRUM_MAINNET_RPC_URL}
       --fork-block-number ${FORK_BLOCK_NUMBER}
       --host 0.0.0.0
-      --chain-id 31337
-    ports:
-      - "8545:8545"
+      --chain-id 31337 
+    ports:      - "8545:8545"

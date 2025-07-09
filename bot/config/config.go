@@ -65,5 +65,5 @@ func LoadConfig() (config Config, err error) {
 	log.Println("Configuration loaded successfully.")
         log.Printf("Using ETH RPC URL: %s", config.EthRPCURL)
 
-        return
+	return
 }

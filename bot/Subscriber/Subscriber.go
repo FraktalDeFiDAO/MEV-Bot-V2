@@ -21,23 +21,23 @@ func Subscription(
 		Topics: [][]common.Hash{eventTopics},
 	}
 
-	        // Use an inner buffered channel to prevent blocking the underlying subscription
-	        inner := make(chan types.Log, 100)
-	        sub, err := client.SubscribeFilterLogs(context.Background(), query, inner)
-	        if err != nil {
-	            return nil, err
-	        }
+	// Use an inner buffered channel to prevent blocking the underlying subscription
+	inner := make(chan types.Log, 100)
+	sub, err := client.SubscribeFilterLogs(context.Background(), query, inner)
+	if err != nil {
+		return nil, err
+	}
 
-	        // Forward logs non-blocking to external channel, dropping if full
-	        go func() {
-	            for vLog := range inner {
-	                select {
-	                case logs <- vLog:
-	                default:
-	                    // drop log to avoid backpressure
-	                }
-	            }
-	        }()
+	// Forward logs non-blocking to external channel, dropping if full
+	go func() {
+		for vLog := range inner {
+			select {
+			case logs <- vLog:
+			default:
+				// drop log to avoid backpressure
+			}
+		}
+	}()
 
-	        return sub, nil
+	return sub, nil
 }
