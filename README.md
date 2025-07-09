@@ -122,3 +122,7 @@ go run cmd/main.go
 
 This repository uses [GitHub Actions](https://github.com/features/actions) to run the database unit tests on every push and pull request. The workflow lives in `.github/workflows/go.yml` and executes `go test ./Database -run TestDBWriterCommitBatch`.
 
+## Disclaimer: Unstable Research Code
+
+This project is experimental and under active development. The smart contracts and backend services have **known severe bugs** and have **not** been audited for security. Use at your own risk and do **not** deploy the contracts or run the bot with real funds. Issues include incomplete flash‑loan logic, race conditions around transaction nonces, and partial implementations that may result in unexpected behavior.
+
