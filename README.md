@@ -102,10 +102,13 @@ go mod tidy
 
 **Configuration:**
 
-1. Copy config/config.example.yaml to config/config.yaml.  
-2. Update config.yaml with your non-sensitive information (e.g., your RPC URL).  
-3. Set the executor's private key as an environment variable. **DO NOT** hardcode it.  
-   export EXECUTOR\_PRIVATE\_KEY="your\_private\_key\_without\_0x"
+Set the required environment variables before running the bot:
+
+```bash
+export ETH_RPC_URL="https://your.rpc.url"
+export EXECUTOR_PRIVATE_KEY="your_private_key_without_0x"
+export DATABASE_PATH="./mevbot.db"   # or another writable path
+```
 
 **Run Tests:**
 
@@ -114,3 +117,7 @@ go test ./...
 **Run the Bot:**
 
 go run cmd/main.go  
+
+### Continuous Integration
+
+This repository uses [GitHub Actions](https://github.com/features/actions) to run the database unit tests on every push and pull request. The workflow lives in `.github/workflows/go.yml` and executes `go test ./Database -run TestDBWriterCommitBatch`.
