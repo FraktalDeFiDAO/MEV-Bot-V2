@@ -1,10 +1,10 @@
 build-bot:
 	@echo "Building bot"
-	@docker compose run --rm mev-bot-v2-dev \
+	@docker compose run --rm --remove-orphans mev-bot-v2-dev \
 		sh -c "clear && go mod tidy && go mod vendor && go build -o bin/mev-bot-v2-alpha cmd/bot-v2-alpha/main.go"
 
 build-contracts:
-	@docker compose run smart-contracts-dev \
+	@docker compose run -rm --remove-orphans  smart-contracts-dev \
 	    "forge build --force --skip test --skip script/Bindings-0.7.sol"
 
 generate-contract-bindings:
@@ -44,9 +44,9 @@ setup:
 	@if [ ! -f .env ]; then echo "Creating .env from sample" && cp .env.sample .env; fi
 	@echo "Building development containers and installing dependencies"
 	@docker compose pull --quiet anvil smart-contracts-dev
-	@docker compose build mev-bot-v2-dev
-	@docker compose run --rm smart-contracts-dev "forge install --no-git"
-	@docker compose run --rm mev-bot-v2-dev sh -c "go mod tidy && go mod download"
+	@docker compose build mev  -bot-v2-dev
+	@docker compose run --rm --remove-orphans smart-contracts-dev "forge install --no-git"
+	@docker compose run --rm --remove-orphans mev-bot-v2-dev sh -c "go mod tidy && go mod download"
 
 test-bot:
 	@docker compose run --rm mev-bot-v2-dev sh -c "go test ./..."
