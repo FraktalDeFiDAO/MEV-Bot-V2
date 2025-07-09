@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IUniswapV2Pair, IERC20, IUniswapV2Router02} from "../interfaces/IUniswapV2.sol";
-import {IUniswapV3Pool, ISwapRouter} from "../interfaces/IUniswapV3.sol";
+import {IUniswapV2Pair} from "../interfaces/IUniswapV2.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IUniswapV2Router02} from "../interfaces/IUniswapV2Router.sol";
+import {IUniswapV3Pool} from "../interfaces/IUniswapV3.sol";
+import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import {DirectionalFeeData} from "../interfaces/IAlgebra.sol";
 
 library SwapLib {

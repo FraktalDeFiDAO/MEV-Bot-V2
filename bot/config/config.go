@@ -14,9 +14,28 @@ import (
 // Config stores all configuration for the application.
 // The values are read by viper from a config file and/or environment variables.
 type Config struct {
-	EthRPCURL          string `mapstructure:"ETH_RPC_URL"`
-	ExecutorPrivateKey string `mapstructure:"EXECUTOR_PRIVATE_KEY"`
-	DatabasePath       string `mapstructure:"DATABASE_PATH"`
+	EthRPCURL               string   `mapstructure:"ETH_RPC_URL"`
+	ExecutorPrivateKey      string   `mapstructure:"EXECUTOR_PRIVATE_KEY"`
+	DatabasePath            string   `mapstructure:"DATABASE_PATH"`
+	DBPath                  string   `mapstructure:"DB_PATH"`
+	ArbitrumRPCURLWS        string   `mapstructure:"ARBITRUM_RPC_URL_WS"`
+	ArbitrumRPCURLHTTP      string   `mapstructure:"ARBITRUM_RPC_URL_HTTP"`
+	ArbitrumRPCURL          string   `mapstructure:"ARBITRUM_RPC_URL"`
+	MulticallAddress        string   `mapstructure:"MULTICALL_ADDRESS"`
+	DiamondAddress          string   `mapstructure:"DIAMOND_ADDRESS"`
+	PoolTypeCheckerAddress  string   `mapstructure:"POOL_TYPE_CHECKER_ADDRESS"`
+	DBType                  string   `mapstructure:"DB_TYPE"`
+	DBDsn                   string   `mapstructure:"DB_DSN"`
+	TrackedV2Pairs          []string `mapstructure:"TRACKED_V2_PAIRS"`
+	TrackedV3Pools          []string `mapstructure:"TRACKED_V3_POOLS"`
+	LogProcessedEvents      bool     `mapstructure:"LOG_PROCESSED_EVENTS"`
+	StartBlock              uint64   `mapstructure:"START_BLOCK"`
+	DiscoverV2Pools         bool     `mapstructure:"DISCOVER_V2_POOLS"`
+	DiscoverV3Pools         bool     `mapstructure:"DISCOVER_V3_POOLS"`
+	UniswapV2Factory        string   `mapstructure:"UNISWAP_V2_FACTORY"`
+	UniswapV3Factory        string   `mapstructure:"UNISWAP_V3_FACTORY"`
+	V2FactorySyncStartBlock uint64   `mapstructure:"V2_FACTORY_SYNC_START_BLOCK"`
+	V3FactorySyncStartBlock uint64   `mapstructure:"V3_FACTORY_SYNC_START_BLOCK"`
 }
 
 // LoadConfig reads configuration from file and environment variables.
@@ -63,7 +82,13 @@ func LoadConfig() (config Config, err error) {
 
 	// Hide the private key from any logs for security.
 	log.Println("Configuration loaded successfully.")
-        log.Printf("Using ETH RPC URL: %s", config.EthRPCURL)
+	log.Printf("Using ETH RPC URL: %s", config.EthRPCURL)
 
 	return
+}
+
+// Load is a convenience wrapper that mirrors the older API used by some
+// commands. It simply calls LoadConfig and returns the result.
+func Load() (Config, error) {
+	return LoadConfig()
 }

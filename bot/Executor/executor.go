@@ -6,6 +6,7 @@ package Executor
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/hex"
 	"errors"
 	"log"
 	"math/big"
@@ -19,8 +20,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	// CORRECTED: Fixed the typo in the import path.
+	"fraktal/mev-bot-v2/config"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -33,6 +36,24 @@ type Service struct {
 	nonceMu             sync.Mutex
 	nextNonce           uint64
 	nonceInited         bool
+}
+
+// New creates a Service from configuration.
+func New(cfg config.Config) (*Service, error) {
+	client, err := ethclient.Dial(cfg.ArbitrumRPCURLHTTP)
+	if err != nil {
+		return nil, err
+	}
+	pkBytes, err := hex.DecodeString(strings.TrimPrefix(cfg.ExecutorPrivateKey, "0x"))
+	if err != nil {
+		return nil, err
+	}
+	pk, err := crypto.ToECDSA(pkBytes)
+	if err != nil {
+		return nil, err
+	}
+	diamond := common.HexToAddress(cfg.DiamondAddress)
+	return NewService(client, pk, diamond, common.Address{})
 }
 
 // NewService creates and returns a new instance of the Executor service.
@@ -188,5 +209,5 @@ func (s *Service) getSenderAddress() (common.Address, error) {
 	if !ok {
 		return common.Address{}, errors.New("error casting public key to ECDSA")
 	}
-	return bind.PubkeyToAddress(*publicKeyECDSA), nil
+	return crypto.PubkeyToAddress(*publicKeyECDSA), nil
 }

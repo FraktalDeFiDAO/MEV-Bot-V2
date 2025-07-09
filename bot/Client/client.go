@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fraktal/mev-bot-v2/Database" // Import the Database package
 	"fraktal/mev-bot-v2/Executor"
+	"fraktal/mev-bot-v2/model"
 	"log"
 	"net/url"
 	"time"
@@ -14,11 +15,11 @@ import (
 // ArbitrageClient connects to the Dispatcher WebSocket and hands off opportunities to the Executor.
 type ArbitrageClient struct {
 	dispatcherURL string
-	executor      *Executor.Executor // The executor service that will process opportunities.
+	executor      *Executor.Service // The executor service that will process opportunities.
 }
 
 // NewArbitrageClient creates a new client.
-func NewArbitrageClient(dispatcherURL string, executor *Executor.Executor) *ArbitrageClient {
+func NewArbitrageClient(dispatcherURL string, executor *Executor.Service) *ArbitrageClient {
 	return &ArbitrageClient{
 		dispatcherURL: dispatcherURL,
 		executor:      executor,
@@ -76,7 +77,11 @@ func (c *ArbitrageClient) Run() {
 				// Hand off the opportunity to the executor service.
 				// Run in a goroutine to avoid blocking the WebSocket read loop.
 				if c.executor != nil {
-					go c.executor.Execute(op)
+					arb := &model.ArbitrageData{
+						SymbolTicker: op.SymbolTicker,
+						PercentDiff:  op.PercentDiff,
+					}
+					go c.executor.Execute(arb)
 				} else {
 					log.Println("Executor service not initialized, cannot execute.")
 				}
