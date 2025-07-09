@@ -105,5 +105,4 @@ cleanup() {
     echo "✅ Removed temporary build archive."
 }
 
-# --- Run ---
-main
+# --- Run ---main "$@"
