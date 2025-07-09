@@ -5,7 +5,7 @@ This repository contains the full codebase for a high-frequency arbitrage bot de
 ## **System Architecture**
 
 The system is composed of two primary parts: an **On-Chain Component** (Solidity smart contracts) and an **Off-Chain Component** (Go services).
-
+```mermaid
 graph TD  
     subgraph Off-Chain Infrastructure (Go)  
         A\[Ethereum RPC Node\] \--\> B{Subscriber};  
@@ -32,14 +32,16 @@ graph TD
 
     style J fill:\#f9f,stroke:\#333,stroke-width:2px  
     style I fill:\#bbf,stroke:\#333,stroke-width:2px
+```
 
 ### **Key Components**
 
 #### **On-Chain (Solidity)**
 
 * **Diamond.sol**: The central proxy contract that follows the EIP-2535 Diamond Standard. It provides upgradeability and modularity by delegating calls to various facets.  
-* **ArbitrageFacet.sol**: The core execution logic. It receives instructions from the off-chain bot, requests a flash loan from Aave, executes a sequence of two trades, and repays the loan within a single atomic transaction.  
+* **ArbitrageFacet.sol**: The core execution logic. It receives instructions from the off-chain bot, requests a flash loan from Aave, executes a sequence of two trades, and repays the loan within a single atomic transaction.
 * **AccessControlFacet.sol**: Manages ownership and role-based access for administrative functions on the Diamond.
+* **LibArbitrageCalculator.sol**: Library used by the facets to analyze pools, find arbitrage paths, and estimate loan sizes.
 
 #### **Off-Chain (Go)**
 
@@ -55,13 +57,29 @@ graph TD
 
 ### **Prerequisites**
 
-* [Go](https://go.dev/doc/install) (version 1.18+)  
-* [Foundry](https://getfoundry.sh/) for smart contract development and testing.  
+* [Go](https://go.dev/doc/install) (version 1.18+)
+* [Foundry](https://getfoundry.sh/) for smart contract development and testing.
+* Docker and Docker Compose (verify with `docker --version` and `docker compose version`)
 * An Ethereum RPC endpoint URL (e.g., from Infura or Alchemy).
+
+### **Quickstart (Docker & Makefile)**
+
+Ensure Docker and Docker Compose are installed and running, then run the following commands from the project root:
+
+```bash
+make setup      # Build containers, install dependencies, and create a .env file
+make run-dev    # Build the bot and start it along with Anvil
+```
+
+Stop the containers with:
+
+```bash
+make down
+```
 
 ### **1\. Smart Contracts**
 
-Navigate to the smart-contracts directory.
+Navigate to the `contracts` directory.
 
 **Install Dependencies:**
 
@@ -84,10 +102,13 @@ go mod tidy
 
 **Configuration:**
 
-1. Copy config/config.example.yaml to config/config.yaml.  
-2. Update config.yaml with your non-sensitive information (e.g., your RPC URL).  
-3. Set the executor's private key as an environment variable. **DO NOT** hardcode it.  
-   export EXECUTOR\_PRIVATE\_KEY="your\_private\_key\_without\_0x"
+Set the required environment variables before running the bot:
+
+```bash
+export ETH_RPC_URL="https://your.rpc.url"
+export EXECUTOR_PRIVATE_KEY="your_private_key_without_0x"
+export DATABASE_PATH="./mevbot.db"   # or another writable path
+```
 
 **Run Tests:**
 
@@ -95,4 +116,9 @@ go test ./...
 
 **Run the Bot:**
 
-go run main.go  
+go run cmd/main.go  
+
+### Continuous Integration
+
+This repository uses [GitHub Actions](https://github.com/features/actions) to run the database unit tests on every push and pull request. The workflow lives in `.github/workflows/go.yml` and executes `go test ./Database -run TestDBWriterCommitBatch`.
+
