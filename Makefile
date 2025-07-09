@@ -4,8 +4,8 @@ build-bot:
 		sh -c "clear && go mod tidy && go mod vendor && go build -o bin/mev-bot-v2-alpha cmd/bot-v2-alpha/main.go"
 
 build-contracts:
-        @docker compose run smart-contracts-dev \
-                'bash -c "forge build --force --via-ir --skip test"'
+	@docker compose run smart-contracts-dev \
+		'bash -c "forge build --force --via-ir --skip test"'
 
 generate-contract-bindings:
 	@sh -c "./generate_bindings.sh"
@@ -20,7 +20,7 @@ run-bot:
 
 
 gen-codebase:
-        @codebase-gen -dir ./contracts/ \
+	@codebase-gen -dir ./contracts/ \
 		-iname "*.sol" -out codebase_sol.txt  \
 		-exclude "*/lib/*" && \
 		codebase-gen -dir ./bot/ -iname "*.go" \
@@ -40,7 +40,7 @@ down:
 	@docker compose down
 setup:
 	@command -v docker >/dev/null || (echo "Error: docker is not installed or not in PATH."; exit 1)
-       @docker compose --help >/dev/null 2>&1 || command -v docker-compose >/dev/null || (echo "Error: Docker Compose is not installed."; exit 1)
+	@docker compose --help >/dev/null 2>&1 || command -v docker-compose >/dev/null || (echo "Error: Docker Compose is not installed."; exit 1)
 	@if [ ! -f .env ]; then echo "Creating .env from sample" && cp .env.sample .env; fi
 	@echo "Building development containers and installing dependencies"
 	@docker compose pull --quiet anvil smart-contracts-dev
