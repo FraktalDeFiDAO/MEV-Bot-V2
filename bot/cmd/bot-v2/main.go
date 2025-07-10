@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"fraktal/mev-bot-v2/Debug"
+	"fraktal/mev-bot-v2/arb"
 	"fraktal/mev-bot-v2/blockchain" // Adjusted
 	"fraktal/mev-bot-v2/cache"      // Adjusted
 	"fraktal/mev-bot-v2/config"     // Adjusted
@@ -43,6 +45,14 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 	log.Println("Configuration loaded.")
+	var debugLogger *Debug.Logger
+	if cfg.DebugLogPath != "" {
+		debugLogger, err = Debug.NewLogger(cfg.DebugLogPath)
+		if err != nil {
+			log.Fatalf("Failed to create debug logger: %v", err)
+		}
+		defer debugLogger.Close()
+	}
 
 	ethClient, err := blockchain.Connect(cfg.ArbitrumRPCURL) // ethClient still needed for subscriptions
 	if err != nil {
@@ -141,6 +151,9 @@ func main() {
 					continue
 				}
 				memCache.Set(data)
+				if cfg.EnableScanner {
+					arb.Scan(memCache, 0.001, debugLogger)
+				}
 				if cfg.LogProcessedEvents {
 					log.Printf("LIVE: %s %s: T0 %s (%.6f) / T1 %s (%.6f) @ %s", data.Protocol, data.PoolAddress, data.Token0Symbol, data.PriceToken1ForToken0, data.Token1Symbol, data.PriceToken0ForToken1, data.Timestamp.Format(time.RFC3339))
 				}
