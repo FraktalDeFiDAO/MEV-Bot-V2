@@ -38,24 +38,6 @@ type Service struct {
 	nonceInited         bool
 }
 
-// New creates a Service from configuration.
-func New(cfg config.Config) (*Service, error) {
-	client, err := ethclient.Dial(cfg.ArbitrumRPCURLHTTP)
-	if err != nil {
-		return nil, err
-	}
-	pkBytes, err := hex.DecodeString(strings.TrimPrefix(cfg.ExecutorPrivateKey, "0x"))
-	if err != nil {
-		return nil, err
-	}
-	pk, err := crypto.ToECDSA(pkBytes)
-	if err != nil {
-		return nil, err
-	}
-	diamond := common.HexToAddress(cfg.DiamondAddress)
-	return NewService(client, pk, diamond, common.Address{})
-}
-
 // NewService creates and returns a new instance of the Executor service.
 func NewService(client *ethclient.Client, pk *ecdsa.PrivateKey, diamondAddress, aaveProvider common.Address) (*Service, error) {
 	// CORRECTED: The package name is CamelCase, matching the generated code.

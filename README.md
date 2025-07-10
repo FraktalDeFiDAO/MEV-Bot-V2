@@ -109,12 +109,15 @@ go mod tidy
 
 **Configuration:**
 
-Set the required environment variables before running the bot:
+Create a `.env` file in either the project root or the `bot/` directory.
+The loader searches both locations automatically when the bot starts.
+Specify at least the following variables:
 
 ```bash
-export ETH_RPC_URL="https://your.rpc.url"
-export EXECUTOR_PRIVATE_KEY="your_private_key_without_0x"
-export DATABASE_PATH="./mevbot.db"   # or another writable path
+ETH_RPC_URL="https://your.rpc.url"
+EXECUTOR_PRIVATE_KEY="your_private_key_without_0x"
+DATABASE_PATH="./mevbot.db"   # or another writable path
+
 ```
 
 **Run Tests:**

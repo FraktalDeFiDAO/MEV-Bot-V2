@@ -7,8 +7,8 @@ build-bot:
 		sh -c "clear && go mod tidy && go mod vendor && go build -o bin/mev-bot-v2-alpha cmd/bot-v2-alpha/main.go"
 
 build-contracts:
-	@docker compose run --rm --remove-orphans  smart-contracts-dev \
-	    "forge build --force --skip test --skip script/Bindings-0.7.sol"
+	@docker compose run smart-contracts-dev \
+		'bash -c "forge build --force --skip test"'
 
 generate-contract-bindings:
 	@sh -c "./generate_bindings.sh"
@@ -41,18 +41,20 @@ run-bot-client:
 
 down:
 	@docker compose down
+
 setup:
 	@command -v docker >/dev/null || (echo "Error: docker is not installed or not in PATH."; exit 1)
 	@docker compose --help >/dev/null 2>&1 || command -v docker-compose >/dev/null || (echo "Error: Docker Compose is not installed."; exit 1)
 	@if [ ! -f .env ]; then echo "Creating .env from sample" && cp .env.sample .env; fi
 	@echo "Building development containers and installing dependencies"
 	@docker compose pull --quiet anvil smart-contracts-dev
-	@docker compose build mev  -bot-v2-dev
-	@docker compose run --rm --remove-orphans smart-contracts-dev "forge install --no-git"
-	@docker compose run --rm --remove-orphans mev-bot-v2-dev sh -c "go mod tidy && go mod download"
+	@docker compose build mev-bot-v2-dev
+	@docker compose run --rm smart-contracts-dev bash -c "forge install"
+	@docker compose run --rm mev-bot-v2-dev sh -c "go mod tidy && go mod download"
 
 test-bot:
-	@docker compose run --rm mev-bot-v2-dev sh -c "go test ./..."
+	@docker compose run mev-bot-v2-dev sh -c "go test ./..."
 
 test-contracts:
-	@docker compose run --rm smart-contracts-dev "forge test --fork-url arbitrum -vv"
+	@docker compose run smart-contracts-dev bash -c "forge test --fork-url $${MAINNET_RPC_URL} -vv"
+

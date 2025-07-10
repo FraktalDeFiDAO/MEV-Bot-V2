@@ -8,6 +8,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -40,6 +41,9 @@ type Config struct {
 
 // LoadConfig reads configuration from file and environment variables.
 func LoadConfig() (config Config, err error) {
+	// --- Load .env files if present ---
+	_ = godotenv.Load("../.env", ".env")
+
 	// --- Set up Viper ---
 
 	// Set the file path for the configuration file.
@@ -87,8 +91,8 @@ func LoadConfig() (config Config, err error) {
 	return
 }
 
-// Load is a convenience wrapper that mirrors the older API used by some
-// commands. It simply calls LoadConfig and returns the result.
+// Load is a backward-compatible alias for LoadConfig.
+
 func Load() (Config, error) {
 	return LoadConfig()
 }
