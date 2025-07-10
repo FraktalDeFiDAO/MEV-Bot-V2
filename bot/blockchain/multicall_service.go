@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/big"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -28,8 +29,9 @@ type TokenMetadata struct {
 }
 
 type MulticallService struct {
-	caller     *multicall.Caller
-	tokenCache *lru.Cache[string, TokenMetadata]
+	caller         *multicall.Caller
+	tokenCache     *lru.Cache[string, TokenMetadata]
+	defaultTimeout time.Duration
 }
 
 func NewMulticallService(rpcURL string) (*MulticallService, error) {
@@ -42,9 +44,14 @@ func NewMulticallService(rpcURL string) (*MulticallService, error) {
 		return nil, fmt.Errorf("failed to create token metadata cache: %w", err)
 	}
 	return &MulticallService{
-		caller:     caller,
-		tokenCache: tokenCache,
+		caller:         caller,
+		tokenCache:     tokenCache,
+		defaultTimeout: 5 * time.Second,
 	}, nil
+}
+
+func (s *MulticallService) DefaultTimeout() time.Duration {
+	return s.defaultTimeout
 }
 
 type tokenOutput struct{ Addr common.Address }
