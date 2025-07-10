@@ -4,14 +4,19 @@ pragma solidity ^0.8.20;
 enum ExchangePlatform {
     Unknown,
     UniswapV2,
-    UniswapV3
-=======ev
+    UniswapV3,
+    SushiSwap,
+    CurvePlainPool,
+    BalancerV2Vault
 }
 
 enum ExchangeCategory {
     Unknown,
     UniswapV2,
-    UniswapV3
+    UniswapV3,
+    SushiSwap,
+    Curve,
+    BalancerV2
 }
 
 struct Exchange {
@@ -64,4 +69,6 @@ bytes32 constant EXCHANGE_HELPER_ADMIN_ROLE = keccak256("EXCHANGE_HELPER_ADMIN_R
 
 interface IExchangeHelper {
     function detectExchangeType(address pool) external view returns (ExchangeCategory category, bool success);
+
+    function getExchangeById(uint16 id) external view returns (Exchange memory);
 }
