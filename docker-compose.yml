@@ -34,7 +34,7 @@ services:
     working_dir: /home/foundry/app
     # Set the RPC_URL so you can run scripts inside the container against Anvil
     environment:
-      - RPC_URL=http://anvil:8545 
+      - RPC_URL=http://anvil:8545
     env_file:
       - .env
     user: root
@@ -51,6 +51,6 @@ services:
       --fork-url ${ARBITRUM_MAINNET_RPC_URL}
       --fork-block-number ${FORK_BLOCK_NUMBER}
       --host 0.0.0.0
-      --chain-id 31337 
+      --chain-id 31337
     ports:
       - "8545:8545"

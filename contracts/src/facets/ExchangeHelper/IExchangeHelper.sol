@@ -5,6 +5,7 @@ enum ExchangePlatform {
     Unknown,
     UniswapV2,
     UniswapV3
+=======ev
 }
 
 enum ExchangeCategory {
@@ -51,6 +52,7 @@ event ExchangeStatusChanged(uint16 indexed id, bool isActive);
 error EH_ExchangeNotFoundById();
 error EH_ExchangeAlreadyExists();
 error EH_ExchangeIdTaken();
+
 error EH_InvalidNameLength();
 error EH_InvalidFactoryContract();
 error EH_NotInitialized();

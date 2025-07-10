@@ -6,6 +6,7 @@ package Executor
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/hex"
 	"errors"
 	"log"
 	"math/big"
@@ -19,8 +20,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	// CORRECTED: Fixed the typo in the import path.
+	"fraktal/mev-bot-v2/config"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -188,5 +191,5 @@ func (s *Service) getSenderAddress() (common.Address, error) {
 	if !ok {
 		return common.Address{}, errors.New("error casting public key to ECDSA")
 	}
-	return bind.PubkeyToAddress(*publicKeyECDSA), nil
+	return crypto.PubkeyToAddress(*publicKeyECDSA), nil
 }

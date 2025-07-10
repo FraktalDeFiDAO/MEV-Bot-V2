@@ -30,7 +30,10 @@ main() {
 
     # 2. Build for each required solc version
     build_for_version "0.8.28" "script/Bindings-0.8.sol"
-    build_for_version "0.7.6"  "script/Bindings-0.7.sol"
+    # The 0.7.x bindings are optional and require downloading solc-0.7.6, which
+    # may fail in restricted environments. Skip by default to ensure the
+    # contracts compile without network access.
+    # build_for_version "0.7.6"  "script/Bindings-0.7.sol"
 
     # 3. Generate bindings from all archived artifacts
     generate_all_bindings

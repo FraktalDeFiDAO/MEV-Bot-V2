@@ -1,6 +1,9 @@
+include .env
+export
+
 build-bot:
 	@echo "Building bot"
-	@docker compose run mev-bot-v2-dev \
+	@docker compose run --rm --remove-orphans mev-bot-v2-dev \
 		sh -c "clear && go mod tidy && go mod vendor && go build -o bin/mev-bot-v2-alpha cmd/bot-v2-alpha/main.go"
 
 build-contracts:
@@ -10,9 +13,9 @@ build-contracts:
 generate-contract-bindings:
 	@sh -c "./generate_bindings.sh"
 
-run-dev: 
+run-dev:
 	@${MAKE} build-bot && \
-		${MAKE} run-bot 
+		${MAKE} run-bot
 
 run-bot:
 	@echo "Running bot with local anvil"
@@ -54,3 +57,4 @@ test-bot:
 
 test-contracts:
 	@docker compose run smart-contracts-dev bash -c "forge test --fork-url $${MAINNET_RPC_URL} -vv"
+

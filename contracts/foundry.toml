@@ -1,0 +1,31 @@
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib', "dependencies"]
+fuzz_runs = 256
+ffi = true
+via_ir = true
+solc_version = '0.8.28'
+auto_detect_solc = true
+fs_permissions = [{ access = "read", path = "./broadcast"}]
+ 
+# remappings = ["@openzeppelin/=lib/openzeppelin-contracts/" ,"@chainlink/=lib/chainlink/"]
+
+[rpc_endpoints]
+mainnet = "${MAINNET_RPC_URL}"
+arbitrum = "${ARBITRUM_RPC_URL}"
+
+[fmt]
+line_length = 120
+
+[dependencies]
+"@uniswap-v3-periphery" = "1.0.0"
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+mainnet2 = { key = "ABCDEFG", chain = "mainnet" }
+optimism = { key = "1234567" }
+unknown_chain = { key = "ABCDEFG", url = "<etherscan api url for this chain>" }
+arbitrum = { key = "${ARBISCAN_API_KEY}" }
+
