@@ -8,6 +8,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -21,6 +22,9 @@ type Config struct {
 
 // LoadConfig reads configuration from file and environment variables.
 func LoadConfig() (config Config, err error) {
+	// --- Load .env files if present ---
+	_ = godotenv.Load("../.env", ".env")
+
 	// --- Set up Viper ---
 
 	// Set the file path for the configuration file.
@@ -68,55 +72,7 @@ func LoadConfig() (config Config, err error) {
 	return
 }
 
-
-// =================================================================
-// FILE: App/App.go (EXAMPLE USAGE)
-// =================================================================
-// An example of how you would use the new LoadConfig function in your main app setup.
-
-package App
-
-import (
-	"context"
-	"log"
-
-	// Import the new config package
-	"fraktal/mev-bot-v2/config"
-
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	// ... other imports
-)
-
-// ... (keep your existing App struct)
-
-// NewApp initializes the application and all its constituent services.
-func NewApp() (*App, error) {
-	// Load configuration first
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
-	}
-
-	// Initialize Ethereum client using the URL from config
-	ethClient, err := ethclient.Dial(cfg.EthRPCURL)
-	if err != nil {
-		log.Fatalf("Failed to connect to Ethereum client: %v", err)
-	}
-
-	// Example of using the private key securely from config
-	// NOTE: This part is for demonstration. Your Executor service would handle this.
-	privateKey, err := crypto.HexToECDSA(cfg.ExecutorPrivateKey)
-	if err != nil {
-		log.Fatalf("Failed to parse executor private key: %v", err)
-	}
-	// Now you can use the 'privateKey' object to sign transactions.
-
-	// ... rest of your application setup using cfg values
-	// For example, when initializing the Database service:
-	// dbService := Database.NewService(cfg.DatabasePath)
-
-	log.Println("Application initialized successfully.")
-	// ...
-	return &App{/* ... */}, nil
+// Load is a backward-compatible alias for LoadConfig.
+func Load() (Config, error) {
+	return LoadConfig()
 }

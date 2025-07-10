@@ -45,4 +45,4 @@ uniswap-lib.txt
 .DS_Store
 Thumbs.db
 */vendor/
-smart-contracts/lib/
+contracts/lib/

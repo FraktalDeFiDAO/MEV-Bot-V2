@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -11,8 +12,10 @@ import (
 )
 
 var (
-	V2ABI abi.ABI
-	V3ABI abi.ABI
+	V2ABI    abi.ABI
+	V3ABI    abi.ABI
+	initOnce sync.Once
+	initErr  error
 )
 
 // Service holds the ABIs for parsing.
@@ -20,19 +23,31 @@ type Service struct{}
 
 // NewService creates a new Parser service.
 func NewService() (*Service, error) {
-	var err error
-	v2AbiString := `[{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount0In","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1In","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount0Out","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1Out","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"Swap","type":"event"}]`
-	v3AbiString := `[{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"int256","name":"amount0","type":"int256"},{"indexed":false,"internalType":"int256","name":"amount1","type":"int256"},{"indexed":false,"internalType":"uint160","name":"sqrtPriceX96","type":"uint160"},{"indexed":false,"internalType":"uint128","name":"liquidity","type":"uint128"},{"indexed":false,"internalType":"int24","name":"tick","type":"int24"}],"name":"Swap","type":"event"}]`
-
-	V2ABI, err = abi.JSON(strings.NewReader(v2AbiString))
-	if err != nil {
-		return nil, err
-	}
-	V3ABI, err = abi.JSON(strings.NewReader(v3AbiString))
-	if err != nil {
+	if err := initABIs(); err != nil {
 		return nil, err
 	}
 	return &Service{}, nil
+}
+
+// initABIs lazily parses the V2 and V3 ABIs once in a thread-safe manner.
+func initABIs() error {
+	initOnce.Do(func() {
+		v2AbiString := `[{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount0In","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1In","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount0Out","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1Out","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"Swap","type":"event"}]`
+		v3AbiString := `[{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"int256","name":"amount0","type":"int256"},{"indexed":false,"internalType":"int256","name":"amount1","type":"int256"},{"indexed":false,"internalType":"uint160","name":"sqrtPriceX96","type":"uint160"},{"indexed":false,"internalType":"uint128","name":"liquidity","type":"uint128"},{"indexed":false,"internalType":"int24","name":"tick","type":"int24"}],"name":"Swap","type":"event"}]`
+
+		var err error
+		V2ABI, err = abi.JSON(strings.NewReader(v2AbiString))
+		if err != nil {
+			initErr = err
+			return
+		}
+		V3ABI, err = abi.JSON(strings.NewReader(v3AbiString))
+		if err != nil {
+			initErr = err
+			return
+		}
+	})
+	return initErr
 }
 
 // LogSwapV2 holds parsed data for a Uniswap V2 swap.
