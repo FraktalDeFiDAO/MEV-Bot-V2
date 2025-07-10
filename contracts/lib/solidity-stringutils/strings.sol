@@ -82,7 +82,7 @@ library strings {
      * @param self The value to find the length of.
      * @return The length of the string, from 0 to 32.
      */
-    function len(bytes32 self) internal pure returns (uint) {
+    function lenBytes32(bytes32 self) internal pure returns (uint) {
         uint ret;
         if (self == 0)
             return 0;
@@ -123,7 +123,7 @@ library strings {
             mstore(ptr, self)
             mstore(add(ret, 0x20), ptr)
         }
-        ret._len = len(self);
+        ret._len = lenBytes32(self);
     }
 
     /*

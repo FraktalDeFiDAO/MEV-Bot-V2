@@ -84,6 +84,14 @@ contract TokenHelperFacet is ITokenHelper, ReentrancyGuard {
         return LibTokenHelper.deactivateToken(tokenAddress);
     }
 
+    // ---------------------------------------------------------------------
+    // View functions
+    // ---------------------------------------------------------------------
+
+    function getTokenInfo(address token) external view override returns (TokenInfo memory) {
+        return LibTokenHelper.getTokenInfo(token);
+    }
+
     function fetchTokenInfo(address tokenAddress) external view virtual override returns (TokenInfo memory) {
         return LibTokenHelper.fetchTokenInfo(tokenAddress);
     }

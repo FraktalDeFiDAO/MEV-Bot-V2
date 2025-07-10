@@ -20,6 +20,15 @@ import {ArbitrageFacet} from "./ArbitrageFacet.sol";
  *      This promotes code reuse and separation of concerns.
  */
 contract ArbitrageFacetV2 is IArbitrageV2, ReentrancyGuard {
+    /// @notice Emitted after assessing a pool pair for arbitrage viability
+    event PathAssessed(
+        address indexed poolA,
+        address indexed poolB,
+        bool profitable,
+        address loanAsset,
+        uint256 loanAmount,
+        uint256 expectedProfit
+    );
     /**
      * @notice Main entry point for executing a batch of arbitrage opportunities.
      * @dev Loops through each provided pool pair, assesses it for profitability, and executes if a valid opportunity is found.
@@ -28,7 +37,6 @@ contract ArbitrageFacetV2 is IArbitrageV2, ReentrancyGuard {
      */
     function executePoolPairArbitrage(ArbitragePoolPair[] calldata opportunities)
         external
-        override
         nonReentrant
     {
         for (uint i = 0; i < opportunities.length; i++) {
@@ -72,7 +80,6 @@ contract ArbitrageFacetV2 is IArbitrageV2, ReentrancyGuard {
     function assessOpportunity(ArbitragePoolPair calldata opportunity)
         public
         view
-        override
         returns (ResolvedArbitragePath memory)
     {
         // 1. Get standardized information for both pools.
@@ -112,7 +119,7 @@ contract ArbitrageFacetV2 is IArbitrageV2, ReentrancyGuard {
      * @param opportunity The original pool pair data containing exchange IDs and addresses.
      * @return A boolean indicating profitability and the fully constructed ResolvedArbitragePath.
      */
-    function _assessSingleDirection(
+function _assessSingleDirection(
         address startToken,
         address pivotToken,
         LibArbitrageCalculator.PoolInfo memory pool1,
@@ -169,5 +176,13 @@ contract ArbitrageFacetV2 is IArbitrageV2, ReentrancyGuard {
 
         // Return a default "not profitable" struct.
         return (false, ResolvedArbitragePath(false, address(0), 0, ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), ActionSwapParams(address(0),address(0),address(0),address(0),0,0,0,0,0,address(0),""), 0));
+    }
+
+    /// @inheritdoc IArbitrageV2
+    function findProfitablePath(
+        ArbitragePoolPair calldata,
+        uint256
+    ) external view override returns (ResolvedArbitragePath memory) {
+        revert NoProfitablePathFound();
     }
 }
