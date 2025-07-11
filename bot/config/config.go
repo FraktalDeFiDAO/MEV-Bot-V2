@@ -37,6 +37,8 @@ type Config struct {
 	UniswapV3Factory        string   `mapstructure:"UNISWAP_V3_FACTORY"`
 	V2FactorySyncStartBlock uint64   `mapstructure:"V2_FACTORY_SYNC_START_BLOCK"`
 	V3FactorySyncStartBlock uint64   `mapstructure:"V3_FACTORY_SYNC_START_BLOCK"`
+	DebugLogPath            string   `mapstructure:"DEBUG_LOG_PATH"`
+	EnableScanner           bool     `mapstructure:"ENABLE_SCANNER"`
 }
 
 // LoadConfig reads configuration from file and environment variables.
@@ -87,6 +89,9 @@ func LoadConfig() (config Config, err error) {
 	// Hide the private key from any logs for security.
 	log.Println("Configuration loaded successfully.")
 	log.Printf("Using ETH RPC URL: %s", config.EthRPCURL)
+	if config.DebugLogPath != "" {
+		log.Printf("Debug logging to %s", config.DebugLogPath)
+	}
 
 	return
 }
